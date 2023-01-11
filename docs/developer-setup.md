@@ -7,6 +7,8 @@ This allows you to get started by just running:
 ```bash
 cd path/to/pixelpact
 direnv allow
+
+start-server
 ```
 
 Alternatively, you can manually install node, for example using [nvm](https://github.com/nvm-sh/nvm).

@@ -14,9 +14,14 @@
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
       nodejs = pkgs.nodejs-19_x;
+      start-server = pkgs.writeShellScriptBin "start-server" ''cd $REPOSITORY_ROOT/pixelpact; npm run start'';
     in {
       devShell = pkgs.mkShellNoCC {
-        buildInputs = with pkgs; [nodejs];
+        buildInputs = with pkgs; [nodejs start-server];
+        shellHook = ''
+          export REPOSITORY_ROOT=$(pwd)
+        '';
+
       };
 
       # enable formatting via `nix fmt`
