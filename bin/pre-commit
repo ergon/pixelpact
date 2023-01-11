@@ -14,3 +14,7 @@ popd
 pushd "example"
 npm run format
 popd
+
+if [ "$(type -p nix)" ]; then
+  nix fmt
+fi
