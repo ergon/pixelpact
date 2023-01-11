@@ -21,6 +21,7 @@
         buildInputs = with pkgs; [nodejs start-server start-server-docker];
         shellHook = ''
           export REPOSITORY_ROOT=$(pwd)
+          ln -fs "$REPOSITORY_ROOT/bin/pre-commit" "$REPOSITORY_ROOT/.git/hooks/pre-commit"
         '';
 
       };
