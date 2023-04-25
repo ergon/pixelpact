@@ -17,7 +17,7 @@
       start-server = pkgs.writeShellScriptBin "start-server" ''cd $REPOSITORY_ROOT/pixelpact; npm run start'';
       start-server-docker = pkgs.writeShellScriptBin "start-server-docker" ''cd $REPOSITORY_ROOT/pixelpact; docker compose up --build'';
     in {
-      devShell = pkgs.mkShellNoCC {
+      devShells.default = pkgs.mkShellNoCC {
         buildInputs = with pkgs; [nodejs start-server start-server-docker];
         shellHook = ''
           export REPOSITORY_ROOT=$(pwd)
