@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js",
+    "start": "supervisor -- index.js",
     "format": "npx prettier --write ."
   },
   "dependencies": {
@@ -17,6 +17,7 @@
     "pngjs": "^6.0.0"
   },
   "devDependencies": {
-    "prettier": "2.8.2"
+    "prettier": "2.8.2",
+    "supervisor": "^0.12.0"
   }
 }
