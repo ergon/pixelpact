@@ -7,9 +7,7 @@ server.post("/", async (request) => {
   let actualHtml = request.body.actualHtml;
   let expected = Buffer.from(request.body.expected, "base64");
 
-  let result = await snapshot(expected, actualHtml, {
-    threshold: 0.01,
-  });
+  let result = await snapshot(expected, actualHtml);
 
   return {
     actual: result.actual.toString("base64"),
