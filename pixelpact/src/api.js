@@ -1,7 +1,8 @@
 import fastify from "fastify";
-import { snapshot } from "./snapshot.js";
+import { compare } from "./compare.js";
+import { render } from "./render.js";
 
-export function buildFastify(snapshotFn) {
+export function buildFastify(renderFn, compareFn) {
   const server = fastify({ logger: false });
 
   server.addSchema({
@@ -24,7 +25,8 @@ export function buildFastify(snapshotFn) {
       let actualHtml = request.body.actualHtml;
       let expected = Buffer.from(request.body.expected, "base64");
 
-      let result = await snapshotFn(expected, actualHtml);
+      let actual = await renderFn(actualHtml);
+      let result = await compareFn(expected, actual);
 
       return {
         actual: result.actual.toString("base64"),
@@ -38,7 +40,7 @@ export function buildFastify(snapshotFn) {
 }
 
 export async function startApiServer() {
-  await buildFastify(snapshot).listen(
+  await buildFastify(render, compare).listen(
     { host: "0.0.0.0", port: 8888 },
     (error, address) => {
       if (error != null) {

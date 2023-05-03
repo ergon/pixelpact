@@ -1,7 +1,18 @@
 import { buildFastify } from "./api.js";
 
-describe("", () => {
-  setupServer();
+let app = undefined;
+
+describe("api", () => {
+  beforeAll(async () => {
+    app = buildFastify(mockRender, mockCompare);
+    await app.ready();
+  });
+
+  afterAll(async () => {
+    await app.close();
+    app = undefined;
+  });
+
   describe("POST /", () => {
     it("returns 400 when actualHtml is missing", async () => {
       const response = await app.inject({
@@ -56,24 +67,15 @@ describe("", () => {
   });
 });
 
-let app = undefined;
-function setupServer() {
-  beforeAll(async () => {
-    app = buildFastify(mockSnapshot);
-    await app.ready();
-  });
-
-  afterAll(async () => {
-    await app.close();
-    app = undefined;
-  });
+async function mockRender(actualHtml) {
+  return Buffer.from("YWN0dWFsCg==", "base64");
 }
 
-function mockSnapshot(expected, actualHtml, options) {
+function mockCompare(expected, actual, options) {
   return {
     numDiffPixels: 42,
     expected: expected,
-    actual: Buffer.from("YWN0dWFsCg==", "base64"),
+    actual: actual,
     diff: Buffer.from("ZGlmZgo=", "base64"),
   };
 }
