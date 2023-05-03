@@ -8,9 +8,7 @@
     "start": "node index.js",
     "format": "npx prettier --write ."
   },
-  "dependencies": {
-    "node-fetch": "^3.2.10"
-  },
+  "dependencies": {},
   "devDependencies": {
     "prettier": "2.8.2"
   }
