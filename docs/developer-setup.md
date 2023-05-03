@@ -7,7 +7,8 @@ This allows you to get started by just running:
 ```bash
 cd path/to/pixelpact
 direnv allow
-
+cd pixelpact
+npm install
 start-server
 ```
 
@@ -19,5 +20,6 @@ The core of Pixelpact is located in the `pixelpact/` directory. To start the ser
 
 ```bash
 cd pixelpact/
+npm install
 npm start
 ```
