@@ -4,8 +4,9 @@
   "description": "Pixelpact gets you started quickly with visual testing for the web.",
   "type": "module",
   "license": "MIT",
+  "main": "src/index.js",
   "scripts": {
-    "start": "supervisor -- index.js",
+    "start": "supervisor -- src/index.js",
     "format": "npx prettier --write ."
   },
   "dependencies": {
