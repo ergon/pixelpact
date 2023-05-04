@@ -3,12 +3,12 @@ import { buildFastify } from "./api.js";
 let app = undefined;
 
 describe("api", () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = buildFastify(mockRender, mockCompare);
     await app.ready();
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await app.close();
     app = undefined;
   });
