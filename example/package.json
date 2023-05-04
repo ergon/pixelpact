@@ -1,0 +1,15 @@
+{
+  "name": "pixelpact-example",
+  "version": "1.0.0",
+  "description": "An example usage of pixelpact for a static HTML page",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "format": "npx prettier --write ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "2.8.2"
+  }
+}
