@@ -6,7 +6,7 @@ export function buildFastify(renderFn, compareFn) {
   const server = fastify({ logger: false });
 
   server.addSchema({
-    $id: "#request",
+    $id: "#check-request",
     type: "object",
     properties: {
       actualHtml: { type: "string" },
@@ -15,10 +15,19 @@ export function buildFastify(renderFn, compareFn) {
     required: ["actualHtml", "expected"],
   });
 
-  server.post("/", {
+  server.addSchema({
+    $id: "#render-request",
+    type: "object",
+    properties: {
+      actualHtml: { type: "string" },
+    },
+    required: ["actualHtml"],
+  });
+
+  server.post("/check", {
     schema: {
       body: {
-        $ref: "#request",
+        $ref: "#check-request",
       },
     },
     handler: async (request) => {
@@ -36,6 +45,24 @@ export function buildFastify(renderFn, compareFn) {
       };
     },
   });
+
+  server.post("/render", {
+    schema: {
+      body: {
+        $ref: "#render-request",
+      },
+    },
+    handler: async (request) => {
+      const actualHtml = request.body.actualHtml;
+
+      const actual = await renderFn(actualHtml);
+
+      return {
+        actual: actual.toString("base64"),
+      };
+    },
+  });
+
   return server;
 }
 
