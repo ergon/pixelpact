@@ -48,7 +48,7 @@ export class ContentServer {
 
   async startServer() {
     console.log("Starting rendering server");
-    this.server = Fastify({ logger: false });
+    this.server = Fastify();
     this.server.register(fastifyStatic, {
       root: this.workingDirectory,
       prefix: "/",

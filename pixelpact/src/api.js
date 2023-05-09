@@ -3,7 +3,7 @@ import { compare } from "./compare.js";
 import { render } from "./render.js";
 
 export function buildFastify(renderFn, compareFn) {
-  const server = fastify({ logger: false });
+  const server = fastify();
 
   server.addSchema({
     $id: "#check-request",
@@ -66,14 +66,8 @@ export function buildFastify(renderFn, compareFn) {
   return server;
 }
 
-export async function startApiServer() {
-  await buildFastify(render, compare).listen(
-    { host: "0.0.0.0", port: 8888 },
-    (error, address) => {
-      if (error != null) {
-        console.error(error);
-      }
-      console.info(`Starting server @ ${address}`);
-    }
-  );
+export async function startApiServer(port = 8888) {
+  const instance = buildFastify(render, compare);
+  await instance.listen({ host: "0.0.0.0", port: port });
+  return instance;
 }
