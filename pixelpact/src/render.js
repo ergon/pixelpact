@@ -67,7 +67,7 @@ export class ContentServer {
   }
 }
 
-class BrowserRenderer {
+export class BrowserRenderer {
   async start() {
     this.browser = await chromium.launch();
     console.log("Browser started...");
@@ -85,7 +85,10 @@ class BrowserRenderer {
   }
 
   async close() {
-    console.log("Stopping browser");
-    this.browser.close();
+    if (this.browser !== undefined) {
+      console.log("Stopping browser");
+      await this.browser.close();
+      this.browser = undefined;
+    }
   }
 }
