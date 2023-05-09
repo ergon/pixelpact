@@ -4,6 +4,7 @@ import os from "node:os";
 import { chromium } from "playwright";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
+import { getLocalAddress } from "./helpers.js";
 
 export async function render(actualHtml) {
   const contentServer = new ContentServer();
@@ -54,8 +55,7 @@ export class ContentServer {
       prefix: "/",
     });
     await this.server.listen({ port: 0 });
-    const address = this.server.addresses().find((e) => e.family === "IPv4");
-    this.url = `http://${address["address"]}:${address["port"]}`;
+    this.url = getLocalAddress(this.server);
     console.log(`Server ready at ${this.url}`);
   }
 
