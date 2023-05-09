@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
-    "start": "supervisor -- src/index.js",
+    "start": "LOG_LEVEL=debug supervisor -- src/index.js | npx pino-pretty",
     "format": "npx prettier --write .",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"

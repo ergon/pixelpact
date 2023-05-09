@@ -8,8 +8,8 @@
     "start": "node index.js",
     "format": "npx prettier --write ."
   },
-  "dependencies": {},
   "devDependencies": {
+    "pino-pretty": "^10.0.0",
     "prettier": "2.8.2"
   }
 }
