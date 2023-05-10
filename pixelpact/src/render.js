@@ -6,16 +6,17 @@ import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import { getLocalAddress } from "./helpers.js";
 import pino from "pino";
+import tar from "tar";
 
 const logger = pino({
   level: process.env.LOG_LEVEL || "info",
 });
 
-export async function render(actualHtml, url, viewport) {
+export async function render(actualHtml, url, viewport, context) {
   const contentServer = new ContentServer();
   const renderer = new BrowserRenderer();
   try {
-    await contentServer.start(actualHtml, url);
+    await contentServer.start(actualHtml, url, context);
     await renderer.start();
     return await renderer.screenshot(contentServer.url, viewport);
   } finally {
@@ -25,17 +26,52 @@ export async function render(actualHtml, url, viewport) {
 }
 
 export class ContentServer {
-  async start(actualHtml, url) {
+  async start(actualHtml, url, context) {
+    await this.setupWorkspace(context);
     await this.startServer(actualHtml, url);
   }
 
   async close() {
     await this.stopServer();
+    await this.cleanUpWorkspace();
+  }
+
+  async cleanUpWorkspace() {
+    if (this.workingDirectory) {
+      await fs.rm(this.workingDirectory, { recursive: true, force: true });
+      this.workingDirectory = undefined;
+    }
+  }
+
+  async setupWorkspace(context) {
+    this.workingDirectory = await fs.mkdtemp(
+      path.join(os.tmpdir(), "pixelpact-")
+    );
+    if (context) {
+      await this.extractTarGz(context, this.workingDirectory);
+    }
+  }
+
+  async extractTarGz(context, outputDirectory) {
+    await new Promise((resolve, reject) => {
+      const writeable = tar.extract({
+        gzip: true,
+        cwd: outputDirectory,
+      });
+      writeable.on("end", () => resolve());
+      writeable.on("error", (error) => reject(error));
+      writeable.write(context);
+      writeable.end();
+    });
   }
 
   async startServer(actualHtml, url) {
     logger.debug("Starting rendering server");
     this.server = Fastify();
+    this.server.register(fastifyStatic, {
+      root: this.workingDirectory,
+      prefix: "/",
+    });
     this.server.get(url, async (request, reply) => {
       reply.type("text/html").send(actualHtml);
     });

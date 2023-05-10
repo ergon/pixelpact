@@ -58,6 +58,17 @@ describe("ContentServer", () => {
 
     expect(content).toBe(anHtmlString);
   });
+
+  it("serves the contents of the context", async () => {
+    const tar = fs.readFileSync("testdata/context.tar.gz");
+    await contentServer.start(anHtmlString, "/", tar);
+
+    const response = await fetch(
+      contentServer.url + "/example/css/example.css"
+    );
+    const content = await response.text();
+    expect(content).toBe("body { background-color: pink; }\n");
+  });
 });
 
 function toExist(actual) {

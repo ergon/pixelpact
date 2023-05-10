@@ -3,7 +3,9 @@ import { compare } from "./compare.js";
 import { render } from "./render.js";
 
 export function buildFastify(renderFn, compareFn) {
-  const server = fastify();
+  const server = fastify({
+    bodyLimit: 512 * 1024 * 1024, // 512MB
+  });
 
   server.addSchema({
     $id: "#viewport",
@@ -21,6 +23,7 @@ export function buildFastify(renderFn, compareFn) {
     properties: {
       expected: { type: "string" },
       actualHtml: { type: "string" },
+      content: { type: "string" },
       url: { type: "string" },
       viewport: { $ref: "#viewport" },
     },
@@ -32,6 +35,7 @@ export function buildFastify(renderFn, compareFn) {
     type: "object",
     properties: {
       actualHtml: { type: "string" },
+      context: { type: "string" },
       url: { type: "string" },
       viewport: { $ref: "#viewport" },
     },
@@ -45,12 +49,15 @@ export function buildFastify(renderFn, compareFn) {
       },
     },
     handler: async (request) => {
-      const actualHtml = request.body.actualHtml;
       const expected = Buffer.from(request.body.expected, "base64");
+      const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
       const url = request.body.url ? request.body.url : "/";
+      const context = request.body.context
+        ? Buffer.from(request.body.context, "base64")
+        : null;
 
-      const actual = await renderFn(actualHtml, url, viewport);
+      const actual = await renderFn(actualHtml, url, viewport, context);
       const result = await compareFn(expected, actual);
 
       return {
@@ -72,8 +79,11 @@ export function buildFastify(renderFn, compareFn) {
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
       const url = request.body.url ? request.body.url : "/";
+      const context = request.body.context
+        ? Buffer.from(request.body.context, "base64")
+        : null;
 
-      const actual = await renderFn(actualHtml, url, viewport);
+      const actual = await renderFn(actualHtml, url, viewport, context);
 
       return {
         actual: actual.toString("base64"),
