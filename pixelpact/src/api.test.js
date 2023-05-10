@@ -57,6 +57,7 @@ describe("api", () => {
         payload: {
           actualHtml: "<h1>Hello World</h1>",
           expected: expected,
+          viewport: { width: 1920, height: 1024 },
         },
       });
 
@@ -98,6 +99,7 @@ describe("api", () => {
         url: "/render",
         payload: {
           actualHtml: "<h1>Hello World</h1>",
+          viewport: { width: 1920, height: 1024 },
         },
       });
 
@@ -110,7 +112,7 @@ describe("api", () => {
   });
 });
 
-async function mockRender(actualHtml) {
+async function mockRender(actualHtml, viewport) {
   return Buffer.from(actual, "base64");
 }
 

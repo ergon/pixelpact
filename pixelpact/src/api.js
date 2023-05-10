@@ -6,13 +6,24 @@ export function buildFastify(renderFn, compareFn) {
   const server = fastify();
 
   server.addSchema({
+    $id: "#viewport",
+    type: "object",
+    properties: {
+      height: { type: "number" },
+      width: { type: "number" },
+    },
+    required: ["height", "width"],
+  });
+
+  server.addSchema({
     $id: "#check-request",
     type: "object",
     properties: {
-      actualHtml: { type: "string" },
       expected: { type: "string" },
+      actualHtml: { type: "string" },
+      viewport: { $ref: "#viewport" },
     },
-    required: ["actualHtml", "expected"],
+    required: ["actualHtml", "expected", "viewport"],
   });
 
   server.addSchema({
@@ -20,8 +31,9 @@ export function buildFastify(renderFn, compareFn) {
     type: "object",
     properties: {
       actualHtml: { type: "string" },
+      viewport: { $ref: "#viewport" },
     },
-    required: ["actualHtml"],
+    required: ["actualHtml", "viewport"],
   });
 
   server.post("/check", {
@@ -33,8 +45,9 @@ export function buildFastify(renderFn, compareFn) {
     handler: async (request) => {
       const actualHtml = request.body.actualHtml;
       const expected = Buffer.from(request.body.expected, "base64");
+      const viewport = request.body.viewport;
 
-      const actual = await renderFn(actualHtml);
+      const actual = await renderFn(actualHtml, viewport);
       const result = await compareFn(expected, actual);
 
       return {
@@ -54,8 +67,9 @@ export function buildFastify(renderFn, compareFn) {
     },
     handler: async (request) => {
       const actualHtml = request.body.actualHtml;
+      const viewport = request.body.viewport;
 
-      const actual = await renderFn(actualHtml);
+      const actual = await renderFn(actualHtml, viewport);
 
       return {
         actual: actual.toString("base64"),

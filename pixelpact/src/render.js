@@ -11,13 +11,13 @@ const logger = pino({
   level: process.env.LOG_LEVEL || "info",
 });
 
-export async function render(actualHtml) {
+export async function render(actualHtml, viewport) {
   const contentServer = new ContentServer();
   const renderer = new BrowserRenderer();
   try {
     await contentServer.start(actualHtml);
     await renderer.start();
-    return await renderer.screenshot(contentServer.url);
+    return await renderer.screenshot(contentServer.url, viewport);
   } finally {
     await renderer.close();
     await contentServer.close();
@@ -80,11 +80,9 @@ export class BrowserRenderer {
     logger.debug("Rendering browser started");
   }
 
-  async screenshot(url) {
+  async screenshot(url, viewport) {
     logger.debug("Creating screenshot", { url });
-    const page = await this.browser.newPage({
-      viewport: { width: 1920, height: 1024 },
-    });
+    const page = await this.browser.newPage({ viewport });
     logger.debug("Waiting for page to load", { url });
     await page.goto(url, { waitUntil: "networkidle" });
     logger.debug(`Page loaded`, { url });
