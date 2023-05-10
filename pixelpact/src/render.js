@@ -11,11 +11,11 @@ const logger = pino({
   level: process.env.LOG_LEVEL || "info",
 });
 
-export async function render(actualHtml, viewport) {
+export async function render(actualHtml, url, viewport) {
   const contentServer = new ContentServer();
   const renderer = new BrowserRenderer();
   try {
-    await contentServer.start(actualHtml);
+    await contentServer.start(actualHtml, url);
     await renderer.start();
     return await renderer.screenshot(contentServer.url, viewport);
   } finally {
@@ -25,39 +25,19 @@ export async function render(actualHtml, viewport) {
 }
 
 export class ContentServer {
-  async start(actualHtml) {
-    await this.setupWorkspace(actualHtml);
-    await this.startServer();
+  async start(actualHtml, url) {
+    await this.startServer(actualHtml, url);
   }
 
   async close() {
     await this.stopServer();
-    await this.cleanUpWorkspace();
   }
 
-  async cleanUpWorkspace() {
-    if (this.workingDirectory) {
-      await fs.rm(this.workingDirectory, { recursive: true, force: true });
-      this.workingDirectory = undefined;
-    }
-  }
-
-  async setupWorkspace(actualHtml) {
-    this.workingDirectory = await fs.mkdtemp(
-      path.join(os.tmpdir(), "screenshots-")
-    );
-    await fs.writeFile(
-      path.join(this.workingDirectory, "index.html"),
-      actualHtml
-    );
-  }
-
-  async startServer() {
+  async startServer(actualHtml, url) {
     logger.debug("Starting rendering server");
     this.server = Fastify();
-    this.server.register(fastifyStatic, {
-      root: this.workingDirectory,
-      prefix: "/",
+    this.server.get(url, async (request, reply) => {
+      reply.type("text/html").send(actualHtml);
     });
     await this.server.listen({ port: 0 });
     this.url = getLocalAddress(this.server);

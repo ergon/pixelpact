@@ -50,31 +50,13 @@ describe("ContentServer", () => {
     contentServer.close();
   });
 
-  it("start prepares a temporary directory with an index.html", async () => {
-    await contentServer.start(anHtmlString);
+  it("serves the the given html contet at the given url after calling start", async () => {
+    await contentServer.start(anHtmlString, "/an-url");
 
-    expect(contentServer.workingDirectory).toExist();
-    expect(`${contentServer.workingDirectory}/index.html`).toHaveContent(
-      anHtmlString
-    );
-  });
-
-  it("serves the the given html string over HTTP after calling start", async () => {
-    await contentServer.start(anHtmlString);
-
-    const response = await fetch(contentServer.url);
+    const response = await fetch(contentServer.url + "/an-url");
     const content = await response.text();
 
     expect(content).toBe(anHtmlString);
-  });
-
-  it("close deletes the temporary directory", async () => {
-    await contentServer.start(anHtmlString);
-    const workingDirectory = contentServer.workingDirectory;
-    await contentServer.close();
-
-    expect(workingDirectory).toNotExist();
-    expect(contentServer.workingDirectory).toBeUndefined();
   });
 });
 

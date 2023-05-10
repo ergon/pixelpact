@@ -21,6 +21,7 @@ export function buildFastify(renderFn, compareFn) {
     properties: {
       expected: { type: "string" },
       actualHtml: { type: "string" },
+      url: { type: "string" },
       viewport: { $ref: "#viewport" },
     },
     required: ["actualHtml", "expected", "viewport"],
@@ -31,6 +32,7 @@ export function buildFastify(renderFn, compareFn) {
     type: "object",
     properties: {
       actualHtml: { type: "string" },
+      url: { type: "string" },
       viewport: { $ref: "#viewport" },
     },
     required: ["actualHtml", "viewport"],
@@ -46,8 +48,9 @@ export function buildFastify(renderFn, compareFn) {
       const actualHtml = request.body.actualHtml;
       const expected = Buffer.from(request.body.expected, "base64");
       const viewport = request.body.viewport;
+      const url = request.body.url ? request.body.url : "/";
 
-      const actual = await renderFn(actualHtml, viewport);
+      const actual = await renderFn(actualHtml, url, viewport);
       const result = await compareFn(expected, actual);
 
       return {
@@ -68,8 +71,9 @@ export function buildFastify(renderFn, compareFn) {
     handler: async (request) => {
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
+      const url = request.body.url ? request.body.url : "/";
 
-      const actual = await renderFn(actualHtml, viewport);
+      const actual = await renderFn(actualHtml, url, viewport);
 
       return {
         actual: actual.toString("base64"),
