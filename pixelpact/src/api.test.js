@@ -112,8 +112,8 @@ describe("api", () => {
   });
 });
 
-async function mockRender(actualHtml, viewport) {
-  return Buffer.from(actual, "base64");
+async function mockRender() {
+  return Buffer.from("YWN0dWFsCg==", "base64");
 }
 
 function mockCompare(expected, actual, options) {

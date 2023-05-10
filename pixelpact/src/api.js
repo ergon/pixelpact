@@ -25,6 +25,7 @@ export function buildFastify(renderFn, compareFn) {
       actualHtml: { type: "string" },
       content: { type: "string" },
       url: { type: "string" },
+      fullpage: { type: "boolean" },
       viewport: { $ref: "#viewport" },
     },
     required: ["actualHtml", "expected", "viewport"],
@@ -37,6 +38,7 @@ export function buildFastify(renderFn, compareFn) {
       actualHtml: { type: "string" },
       context: { type: "string" },
       url: { type: "string" },
+      fullpage: { type: "boolean" },
       viewport: { $ref: "#viewport" },
     },
     required: ["actualHtml", "viewport"],
@@ -53,11 +55,18 @@ export function buildFastify(renderFn, compareFn) {
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
       const url = request.body.url ? request.body.url : "/";
+      const fullpage = request.body.fullpage ? request.body.fullpage : false;
       const context = request.body.context
         ? Buffer.from(request.body.context, "base64")
         : null;
 
-      const actual = await renderFn(actualHtml, url, viewport, context);
+      const actual = await renderFn(
+        actualHtml,
+        url,
+        viewport,
+        fullpage,
+        context
+      );
       const result = await compareFn(expected, actual);
 
       return {
@@ -79,11 +88,18 @@ export function buildFastify(renderFn, compareFn) {
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
       const url = request.body.url ? request.body.url : "/";
+      const fullpage = request.body.fullpage ? request.body.fullpage : false;
       const context = request.body.context
         ? Buffer.from(request.body.context, "base64")
         : null;
 
-      const actual = await renderFn(actualHtml, url, viewport, context);
+      const actual = await renderFn(
+        actualHtml,
+        url,
+        viewport,
+        fullpage,
+        context
+      );
 
       return {
         actual: actual.toString("base64"),
