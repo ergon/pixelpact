@@ -21,11 +21,11 @@ describe("BrowserRenderer", () => {
   it("screenshot takes a screenshot of the given url", async () => {
     await renderer.start();
 
-    const screenshot = await renderer.screenshot("https://ergon.ch");
+    const screenshot = await renderer.screenshot("https://github.com");
 
     expect(screenshot).toBeInstanceOf(Buffer);
     expect(screenshot.length).toBeGreaterThan(0);
-  });
+  }, 10000);
 
   it("close closes the browser", async () => {
     await renderer.start();
