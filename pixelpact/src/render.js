@@ -18,7 +18,11 @@ export async function render(actualHtml, url, viewport, fullpage, context) {
   try {
     await contentServer.start(actualHtml, url, context);
     await renderer.start();
-    return await renderer.screenshot(contentServer.url, viewport, fullpage);
+    return await renderer.screenshot(
+      `${contentServer.url}${url}`,
+      viewport,
+      fullpage
+    );
   } finally {
     await renderer.close();
     await contentServer.close();
