@@ -50,7 +50,7 @@ describe("ContentServer", () => {
     contentServer.close();
   });
 
-  it("serves the the given html contet at the given url after calling start", async () => {
+  it("serves the given html content at the given url after calling start", async () => {
     await contentServer.start(anHtmlString, "/an-url");
 
     const response = await fetch(contentServer.url + "/an-url");
