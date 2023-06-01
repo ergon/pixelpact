@@ -13,6 +13,19 @@
         "@playwright/test",
         "mcr.microsoft.com/playwright"
       ]
+    },
+    {
+      "automerge": true,
+      "matchConfidence": [
+        "high"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "matchAdoption": [
+        ">10"
+      ]
     }
   ]
 }
