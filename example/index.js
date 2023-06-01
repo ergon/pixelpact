@@ -24,7 +24,7 @@ class PixelpactClient {
     return Buffer.from(result.actual, "base64");
   }
 
-  async check(actualHtml, referenceImage, context) {
+  async checkReferenceImage(actualHtml, referenceImage, context) {
     const body = {
       actualHtml,
       expected: referenceImage.toString("base64"),
@@ -49,10 +49,14 @@ class PixelpactClient {
   }
 }
 
-async function check(client, actualHtml, context) {
+async function checkReferenceImage(client, actualHtml, context) {
   const referenceImage = await fs.readFile("screenshots/index-reference.png");
 
-  const result = await client.check(actualHtml, referenceImage, context);
+  const result = await client.checkReferenceImage(
+    actualHtml,
+    referenceImage,
+    context
+  );
 
   await fs.writeFile("screenshots/index-actual.png", result.actual);
   await fs.writeFile("screenshots/index-diff.png", result.diff);
@@ -60,7 +64,7 @@ async function check(client, actualHtml, context) {
   console.log(`Pixel difference was: ${result.numDiffPixels}`);
 }
 
-async function update(client, actualHtml, context) {
+async function updateReferenceImage(client, actualHtml, context) {
   const result = await client.render(actualHtml, context);
   await fs.writeFile("screenshots/index-reference.png", result);
 }
@@ -90,9 +94,9 @@ async function main() {
   const context = await prepareContext();
 
   if (args.length > 0 && args[0] === "update") {
-    await update(client, actualHtml, context);
+    await updateReferenceImage(client, actualHtml, context);
   } else {
-    await check(client, actualHtml, context);
+    await checkReferenceImage(client, actualHtml, context);
   }
 }
 
