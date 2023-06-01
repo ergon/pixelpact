@@ -4,9 +4,11 @@
   "description": "Pixelpact gets you started quickly with visual testing for the web.",
   "type": "module",
   "license": "MIT",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node index.js",
-    "format": "npx prettier --write ."
+    "start": "supervisor -- src/index.js",
+    "format": "npx prettier --write .",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "dependencies": {
     "@fastify/static": "^6.5.0",
@@ -14,9 +16,17 @@
     "fastify": "^4.6.0",
     "pixelmatch": "^5.3.0",
     "playwright": "^1.26.1",
-    "pngjs": "^6.0.0"
+    "pngjs": "^7.0.0"
   },
   "devDependencies": {
-    "prettier": "2.8.2"
+    "jest": "^29.5.0",
+    "prettier": "2.8.2",
+    "supervisor": "^0.12.0"
+  },
+  "jest": {
+    "sandboxInjectedGlobals": [
+      "Math"
+    ],
+    "testEnvironment": "node"
   }
 }
