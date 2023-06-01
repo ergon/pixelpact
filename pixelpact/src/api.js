@@ -54,8 +54,8 @@ export function buildFastify(renderFn, compareFn) {
       const expected = Buffer.from(request.body.expected, "base64");
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
-      const url = request.body.url ? request.body.url : "/";
-      const fullpage = request.body.fullpage ? request.body.fullpage : false;
+      const url = request.body.url ?? "/";
+      const fullpage = request.body.fullpage ?? false;
       const context = request.body.context
         ? Buffer.from(request.body.context, "base64")
         : null;
@@ -87,8 +87,8 @@ export function buildFastify(renderFn, compareFn) {
     handler: async (request) => {
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
-      const url = request.body.url ? request.body.url : "/";
-      const fullpage = request.body.fullpage ? request.body.fullpage : false;
+      const url = request.body.url ?? "/";
+      const fullpage = request.body.fullpage ?? false;
       const context = request.body.context
         ? Buffer.from(request.body.context, "base64")
         : null;
