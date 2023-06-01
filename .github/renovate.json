@@ -15,17 +15,11 @@
       ]
     },
     {
-      "automerge": true,
-      "matchConfidence": [
-        "high"
-      ],
       "matchUpdateTypes": [
         "minor",
         "patch"
       ],
-      "matchAdoption": [
-        ">10"
-      ]
+      "automerge": true
     }
   ]
 }
