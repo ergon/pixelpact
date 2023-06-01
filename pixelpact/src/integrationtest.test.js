@@ -40,6 +40,7 @@ describe("check integration test", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         actualHtml,
+        viewport: { width: 1920, height: 1024 },
       }),
     });
 
@@ -58,6 +59,7 @@ describe("check integration test", () => {
       body: JSON.stringify({
         actualHtml,
         expected,
+        viewport: { width: 1920, height: 1024 },
       }),
     });
 

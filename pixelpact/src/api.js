@@ -3,16 +3,32 @@ import { compare } from "./compare.js";
 import { render } from "./render.js";
 
 export function buildFastify(renderFn, compareFn) {
-  const server = fastify();
+  const server = fastify({
+    bodyLimit: 512 * 1024 * 1024, // 512MB
+  });
+
+  server.addSchema({
+    $id: "#viewport",
+    type: "object",
+    properties: {
+      height: { type: "number" },
+      width: { type: "number" },
+    },
+    required: ["height", "width"],
+  });
 
   server.addSchema({
     $id: "#check-request",
     type: "object",
     properties: {
-      actualHtml: { type: "string" },
       expected: { type: "string" },
+      actualHtml: { type: "string" },
+      content: { type: "string" },
+      url: { type: "string" },
+      fullpage: { type: "boolean" },
+      viewport: { $ref: "#viewport" },
     },
-    required: ["actualHtml", "expected"],
+    required: ["actualHtml", "expected", "viewport"],
   });
 
   server.addSchema({
@@ -20,8 +36,12 @@ export function buildFastify(renderFn, compareFn) {
     type: "object",
     properties: {
       actualHtml: { type: "string" },
+      context: { type: "string" },
+      url: { type: "string" },
+      fullpage: { type: "boolean" },
+      viewport: { $ref: "#viewport" },
     },
-    required: ["actualHtml"],
+    required: ["actualHtml", "viewport"],
   });
 
   server.post("/check", {
@@ -31,10 +51,22 @@ export function buildFastify(renderFn, compareFn) {
       },
     },
     handler: async (request) => {
-      const actualHtml = request.body.actualHtml;
       const expected = Buffer.from(request.body.expected, "base64");
+      const actualHtml = request.body.actualHtml;
+      const viewport = request.body.viewport;
+      const url = request.body.url ?? "/";
+      const fullpage = request.body.fullpage ?? false;
+      const context = request.body.context
+        ? Buffer.from(request.body.context, "base64")
+        : null;
 
-      const actual = await renderFn(actualHtml);
+      const actual = await renderFn(
+        actualHtml,
+        url,
+        viewport,
+        fullpage,
+        context
+      );
       const result = await compareFn(expected, actual);
 
       return {
@@ -54,8 +86,20 @@ export function buildFastify(renderFn, compareFn) {
     },
     handler: async (request) => {
       const actualHtml = request.body.actualHtml;
+      const viewport = request.body.viewport;
+      const url = request.body.url ?? "/";
+      const fullpage = request.body.fullpage ?? false;
+      const context = request.body.context
+        ? Buffer.from(request.body.context, "base64")
+        : null;
 
-      const actual = await renderFn(actualHtml);
+      const actual = await renderFn(
+        actualHtml,
+        url,
+        viewport,
+        fullpage,
+        context
+      );
 
       return {
         actual: actual.toString("base64"),

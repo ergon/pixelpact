@@ -6,18 +6,19 @@ import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import { getLocalAddress } from "./helpers.js";
 import pino from "pino";
+import tar from "tar";
 
 const logger = pino({
   level: process.env.LOG_LEVEL || "info",
 });
 
-export async function render(actualHtml) {
+export async function render(actualHtml, url, viewport, fullpage, context) {
   const contentServer = new ContentServer();
   const renderer = new BrowserRenderer();
   try {
-    await contentServer.start(actualHtml);
+    await contentServer.start(actualHtml, url, context);
     await renderer.start();
-    return await renderer.screenshot(contentServer.url);
+    return await renderer.screenshot(contentServer.url, viewport, fullpage);
   } finally {
     await renderer.close();
     await contentServer.close();
@@ -25,9 +26,9 @@ export async function render(actualHtml) {
 }
 
 export class ContentServer {
-  async start(actualHtml) {
-    await this.setupWorkspace(actualHtml);
-    await this.startServer();
+  async start(actualHtml, url, context) {
+    await this.setupWorkspace(context);
+    await this.startServer(actualHtml, url);
   }
 
   async close() {
@@ -42,22 +43,37 @@ export class ContentServer {
     }
   }
 
-  async setupWorkspace(actualHtml) {
+  async setupWorkspace(context) {
     this.workingDirectory = await fs.mkdtemp(
-      path.join(os.tmpdir(), "screenshots-")
+      path.join(os.tmpdir(), "pixelpact-")
     );
-    await fs.writeFile(
-      path.join(this.workingDirectory, "index.html"),
-      actualHtml
-    );
+    if (context) {
+      await this.extractTarGz(context, this.workingDirectory);
+    }
   }
 
-  async startServer() {
+  async extractTarGz(context, outputDirectory) {
+    await new Promise((resolve, reject) => {
+      const writeable = tar.extract({
+        gzip: true,
+        cwd: outputDirectory,
+      });
+      writeable.on("end", () => resolve());
+      writeable.on("error", (error) => reject(error));
+      writeable.write(context);
+      writeable.end();
+    });
+  }
+
+  async startServer(actualHtml, url) {
     logger.debug("Starting rendering server");
     this.server = Fastify();
     this.server.register(fastifyStatic, {
       root: this.workingDirectory,
       prefix: "/",
+    });
+    this.server.get(url, async (request, reply) => {
+      reply.type("text/html").send(actualHtml);
     });
     await this.server.listen({ port: 0 });
     this.url = getLocalAddress(this.server);
@@ -80,15 +96,13 @@ export class BrowserRenderer {
     logger.debug("Rendering browser started");
   }
 
-  async screenshot(url) {
+  async screenshot(url, viewport, fullPage) {
     logger.debug("Creating screenshot", { url });
-    const page = await this.browser.newPage({
-      viewport: { width: 1920, height: 1024 },
-    });
+    const page = await this.browser.newPage({ viewport });
     logger.debug("Waiting for page to load", { url });
     await page.goto(url, { waitUntil: "networkidle" });
     logger.debug(`Page loaded`, { url });
-    const screenshot = await page.screenshot();
+    const screenshot = await page.screenshot({ fullPage });
     logger.debug(`Screenshot taken`);
     return screenshot;
   }

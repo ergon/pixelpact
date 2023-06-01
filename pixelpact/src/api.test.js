@@ -57,6 +57,7 @@ describe("api", () => {
         payload: {
           actualHtml: "<h1>Hello World</h1>",
           expected: expected,
+          viewport: { width: 1920, height: 1024 },
         },
       });
 
@@ -98,6 +99,7 @@ describe("api", () => {
         url: "/render",
         payload: {
           actualHtml: "<h1>Hello World</h1>",
+          viewport: { width: 1920, height: 1024 },
         },
       });
 
@@ -110,8 +112,8 @@ describe("api", () => {
   });
 });
 
-async function mockRender(actualHtml) {
-  return Buffer.from(actual, "base64");
+async function mockRender() {
+  return Buffer.from("YWN0dWFsCg==", "base64");
 }
 
 function mockCompare(expected, actual, options) {
