@@ -2,6 +2,10 @@ import { buildFastify } from "./api.js";
 
 let app = undefined;
 
+const expected = "ZXhwZWN0ZWQK";
+const actual = "YWN0dWFsCg==";
+const diff = "ZGlmZgo=";
+
 describe("api", () => {
   beforeEach(async () => {
     app = buildFastify(mockRender, mockCompare);
@@ -19,7 +23,7 @@ describe("api", () => {
         method: "POST",
         url: "/",
         payload: {
-          expected: "ZXhwZWN0ZWQK",
+          expected: expected,
         },
       });
 
@@ -52,23 +56,23 @@ describe("api", () => {
         url: "/",
         payload: {
           actualHtml: "<h1>Hello World</h1>",
-          expected: "ZXhwZWN0ZWQK",
+          expected: expected,
         },
       });
 
       expect(response.statusCode).toBe(200);
 
       const body = JSON.parse(response.body);
-      expect(body.expected).toBe("ZXhwZWN0ZWQK");
-      expect(body.actual).toBe("YWN0dWFsCg==");
-      expect(body.diff).toBe("ZGlmZgo=");
+      expect(body.expected).toBe(expected);
+      expect(body.actual).toBe(actual);
+      expect(body.diff).toBe(diff);
       expect(body.numDiffPixels).toBe(42);
     });
   });
 });
 
 async function mockRender(actualHtml) {
-  return Buffer.from("YWN0dWFsCg==", "base64");
+  return Buffer.from(actual, "base64");
 }
 
 function mockCompare(expected, actual, options) {
@@ -76,6 +80,6 @@ function mockCompare(expected, actual, options) {
     numDiffPixels: 42,
     expected: expected,
     actual: actual,
-    diff: Buffer.from("ZGlmZgo=", "base64"),
+    diff: Buffer.from(diff, "base64"),
   };
 }
