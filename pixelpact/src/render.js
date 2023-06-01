@@ -4,6 +4,12 @@ import os from "node:os";
 import { chromium } from "playwright";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
+import { getLocalAddress } from "./helpers.js";
+import pino from "pino";
+
+const logger = pino({
+  level: process.env.LOG_LEVEL || "info",
+});
 
 export async function render(actualHtml) {
   const contentServer = new ContentServer();
@@ -47,45 +53,52 @@ export class ContentServer {
   }
 
   async startServer() {
-    console.log("Starting rendering server");
-    this.server = Fastify({ logger: false });
+    logger.debug("Starting rendering server");
+    this.server = Fastify();
     this.server.register(fastifyStatic, {
       root: this.workingDirectory,
       prefix: "/",
     });
     await this.server.listen({ port: 0 });
-    const address = this.server.addresses().find((e) => e.family === "IPv4");
-    this.url = `http://${address["address"]}:${address["port"]}`;
-    console.log(`Server ready at ${this.url}`);
+    this.url = getLocalAddress(this.server);
+    logger.debug(`rendering server ready`, { url: this.url });
   }
 
   async stopServer() {
     if (this.server) {
-      console.log("Stopping rendering server");
+      logger.debug("Stopping rendering server");
       await this.server.close();
+      logger.debug("Rendering server stopped");
     }
   }
 }
 
-class BrowserRenderer {
+export class BrowserRenderer {
   async start() {
+    logger.debug("Starting rendering  browser");
     this.browser = await chromium.launch();
-    console.log("Browser started...");
+    logger.debug("Rendering browser started");
   }
 
   async screenshot(url) {
-    console.log(`creating screenshot of ${url}`);
+    logger.debug("Creating screenshot", { url });
     const page = await this.browser.newPage({
       viewport: { width: 1920, height: 1024 },
     });
-    console.log(`Go to page`);
+    logger.debug("Waiting for page to load", { url });
     await page.goto(url, { waitUntil: "networkidle" });
-    console.log(`shoot and return`);
-    return await page.screenshot();
+    logger.debug(`Page loaded`, { url });
+    const screenshot = await page.screenshot();
+    logger.debug(`Screenshot taken`);
+    return screenshot;
   }
 
   async close() {
-    console.log("Stopping browser");
-    this.browser.close();
+    if (this.browser !== undefined) {
+      logger.debug("Stopping rendering browser");
+      await this.browser.close();
+      this.browser = undefined;
+      logger.debug("rendering browser stopped");
+    }
   }
 }

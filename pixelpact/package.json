@@ -6,14 +6,16 @@
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
-    "start": "supervisor -- src/index.js",
+    "start": "LOG_LEVEL=debug supervisor -- src/index.js | npx pino-pretty",
     "format": "npx prettier --write .",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
   },
   "dependencies": {
     "@fastify/static": "^6.5.0",
     "@playwright/test": "^1.26.1",
     "fastify": "^4.6.0",
+    "pino": "^8.12.1",
     "pixelmatch": "^5.3.0",
     "playwright": "^1.26.1",
     "pngjs": "^7.0.0"

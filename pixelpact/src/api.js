@@ -3,10 +3,10 @@ import { compare } from "./compare.js";
 import { render } from "./render.js";
 
 export function buildFastify(renderFn, compareFn) {
-  const server = fastify({ logger: false });
+  const server = fastify();
 
   server.addSchema({
-    $id: "#request",
+    $id: "#check-request",
     type: "object",
     properties: {
       actualHtml: { type: "string" },
@@ -15,10 +15,19 @@ export function buildFastify(renderFn, compareFn) {
     required: ["actualHtml", "expected"],
   });
 
-  server.post("/", {
+  server.addSchema({
+    $id: "#render-request",
+    type: "object",
+    properties: {
+      actualHtml: { type: "string" },
+    },
+    required: ["actualHtml"],
+  });
+
+  server.post("/check", {
     schema: {
       body: {
-        $ref: "#request",
+        $ref: "#check-request",
       },
     },
     handler: async (request) => {
@@ -36,17 +45,29 @@ export function buildFastify(renderFn, compareFn) {
       };
     },
   });
+
+  server.post("/render", {
+    schema: {
+      body: {
+        $ref: "#render-request",
+      },
+    },
+    handler: async (request) => {
+      const actualHtml = request.body.actualHtml;
+
+      const actual = await renderFn(actualHtml);
+
+      return {
+        actual: actual.toString("base64"),
+      };
+    },
+  });
+
   return server;
 }
 
-export async function startApiServer() {
-  await buildFastify(render, compare).listen(
-    { host: "0.0.0.0", port: 8888 },
-    (error, address) => {
-      if (error != null) {
-        console.error(error);
-      }
-      console.info(`Starting server @ ${address}`);
-    }
-  );
+export async function startApiServer(port = 8888) {
+  const instance = buildFastify(render, compare);
+  await instance.listen({ host: "0.0.0.0", port: port });
+  return instance;
 }

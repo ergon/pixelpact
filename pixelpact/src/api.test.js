@@ -17,11 +17,11 @@ describe("api", () => {
     app = undefined;
   });
 
-  describe("POST /", () => {
+  describe("POST /check", () => {
     it("returns 400 when actualHtml is missing", async () => {
       const response = await app.inject({
         method: "POST",
-        url: "/",
+        url: "/check",
         payload: {
           expected: expected,
         },
@@ -38,7 +38,7 @@ describe("api", () => {
     it("returns 400 when expected is missing", async () => {
       const response = await app.inject({
         method: "POST",
-        url: "/",
+        url: "/check",
         payload: {
           actualHtml: "<h1>Hello World</h1>",
         },
@@ -53,7 +53,7 @@ describe("api", () => {
     it("returns result when all parameters are provided", async () => {
       const response = await app.inject({
         method: "POST",
-        url: "/",
+        url: "/check",
         payload: {
           actualHtml: "<h1>Hello World</h1>",
           expected: expected,
@@ -63,10 +63,49 @@ describe("api", () => {
       expect(response.statusCode).toBe(200);
 
       const body = JSON.parse(response.body);
+      expect(Object.keys(body).sort()).toEqual([
+        "actual",
+        "diff",
+        "expected",
+        "numDiffPixels",
+      ]);
       expect(body.expected).toBe(expected);
       expect(body.actual).toBe(actual);
       expect(body.diff).toBe(diff);
       expect(body.numDiffPixels).toBe(42);
+    });
+  });
+
+  describe("POST /render", () => {
+    it("returns 400 when actualHtml is missing", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/render",
+        payload: {},
+      });
+
+      expect(response.statusCode).toBe(400);
+
+      const body = JSON.parse(response.body);
+      expect(body.message).toBe(
+        "body must have required property 'actualHtml'"
+      );
+    });
+
+    it("returns result when all parameters are provided", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/render",
+        payload: {
+          actualHtml: "<h1>Hello World</h1>",
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+
+      const body = JSON.parse(response.body);
+      expect(Object.keys(body).sort()).toEqual(["actual"]);
+      expect(body.actual).toBe(actual);
     });
   });
 });
