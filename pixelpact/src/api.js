@@ -22,11 +22,11 @@ export function buildFastify(renderFn, compareFn) {
       },
     },
     handler: async (request) => {
-      let actualHtml = request.body.actualHtml;
-      let expected = Buffer.from(request.body.expected, "base64");
+      const actualHtml = request.body.actualHtml;
+      const expected = Buffer.from(request.body.expected, "base64");
 
-      let actual = await renderFn(actualHtml);
-      let result = await compareFn(expected, actual);
+      const actual = await renderFn(actualHtml);
+      const result = await compareFn(expected, actual);
 
       return {
         actual: result.actual.toString("base64"),

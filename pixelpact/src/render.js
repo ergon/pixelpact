@@ -6,8 +6,8 @@ import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 
 export async function render(actualHtml) {
-  let contentServer = new ContentServer();
-  let renderer = new BrowserRenderer();
+  const contentServer = new ContentServer();
+  const renderer = new BrowserRenderer();
   try {
     await contentServer.start(actualHtml);
     await renderer.start();
@@ -54,7 +54,7 @@ export class ContentServer {
       prefix: "/",
     });
     await this.server.listen({ port: 0 });
-    let address = this.server.addresses().find((e) => e.family === "IPv4");
+    const address = this.server.addresses().find((e) => e.family === "IPv4");
     this.url = `http://${address["address"]}:${address["port"]}`;
     console.log(`Server ready at ${this.url}`);
   }
