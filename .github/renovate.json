@@ -3,5 +3,16 @@
   "extends": [
     "config:base"
   ],
-  "dependencyDashboard": false
+  "dependencyDashboard": false,
+  "packageRules": [
+    {
+      "groupName": "Playwright",
+      "groupSlug": "playwright",
+      "matchPackageNames": [
+        "playwright",
+        "@playwright/test",
+        "mcr.microsoft.com/playwright"
+      ]
+    }
+  ]
 }
