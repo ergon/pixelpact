@@ -1,5 +1,6 @@
 import { startApiServer } from "./api";
 import { getLocalAddress } from "./helpers.js";
+import fs from "fs/promises";
 
 describe("check integration test", () => {
   let instance, baseUrl;
@@ -14,7 +15,7 @@ describe("check integration test", () => {
   });
 
   it("succeeds when calling check with the reference image generated using render", async () => {
-    const htmlContent = "<h1>Hello World</h1>";
+    const htmlContent = await mhtmlOf("<h1>Hello World</h1>");
     const reference = await render(htmlContent);
 
     const result = await check(htmlContent, reference);
@@ -25,10 +26,8 @@ describe("check integration test", () => {
   });
 
   it("fails when calling check with a reference obtained from a different HTML content", async () => {
-    const reference = await render("<h1>Hello Jack</h1>");
-
-    const result = await check("<h1>Hello Jill</h1>", reference);
-
+    const reference = await render(await mhtmlOf("<h1>Hello Jack</h1>"));
+    const result = await check(await mhtmlOf("<h1>Hello Jill</h1>"), reference);
     expect(result.expected).toBe(reference);
     expect(result.actual).not.toBe(reference);
     expect(result.numDiffPixels).toBeGreaterThan(0);
@@ -71,3 +70,8 @@ describe("check integration test", () => {
     return body;
   }
 });
+
+async function mhtmlOf(html) {
+  const template = (await fs.readFile("testdata/template.mhtml")).toString();
+  return template.replace("Hello World", html);
+}
