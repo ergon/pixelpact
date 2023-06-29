@@ -2,3 +2,8 @@ node_modules/
 .idea
 pixelpact/coverage
 .direnv/
+
+example/playwright-report
+example/test-results
+example/pixelpact/*_diff.png
+example/pixelpact/*_actual.png
