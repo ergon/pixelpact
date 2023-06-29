@@ -9,10 +9,12 @@
     "format": "npx prettier --write ."
   },
   "devDependencies": {
+    "@playwright/test": "^1.35.1",
     "pino-pretty": "^10.0.0",
     "prettier": "2.8.8"
   },
   "dependencies": {
+    "@pixelpact-hook/playwright-js": "file:../pixelpact-hooks/playwright-js",
     "tar": "^6.1.14"
   }
 }
