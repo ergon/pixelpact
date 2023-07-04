@@ -36,14 +36,12 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
 }
 
 async function render(actualHtml, page) {
-  const serverUrl = config.serverUrl;
-
   const body = {
     actualHtml,
     viewport: page.viewportSize(),
   };
 
-  const response = await fetch(`${serverUrl}/render`, {
+  const response = await fetch(`${config.serverUrl}/render`, {
     method: "post",
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
@@ -54,8 +52,6 @@ async function render(actualHtml, page) {
 }
 
 async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
-  const serverUrl = config.serverUrl;
-
   const referenceFileName = composeFileName(fileNamePrefix, "expected");
   const referenceFilePath = folderPath + referenceFileName;
   const referenceImage = await fs.readFile(referenceFilePath);
@@ -65,7 +61,7 @@ async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
     viewport: page.viewportSize(),
   };
 
-  const response = await fetch(serverUrl + "/check", {
+  const response = await fetch(config.serverUrl + "/check", {
     method: "post",
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
