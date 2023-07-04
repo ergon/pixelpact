@@ -9,12 +9,10 @@ const config = JSON.parse(
     flag: "r",
   })
 );
-
-const fallbackFolderPath = `${appDir}/pixelpact/`;
+const folderPath = getFolderPath();
 
 export async function toMatchVisually(page, testInfo, fileNamePrefix) {
   const serverUrl = config.serverUrl;
-  const folderPath = getFolderPath();
 
   if (!existsSync(folderPath)) {
     mkdirSync(folderPath);
@@ -57,7 +55,6 @@ async function render(actualHtml, page) {
 
 async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
   const serverUrl = config.serverUrl;
-  const folderPath = getFolderPath();
 
   const referenceFileName = composeFileName(fileNamePrefix, "expected");
   const referenceFilePath = folderPath + referenceFileName;
@@ -85,7 +82,6 @@ async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
 }
 
 async function saveResult(fileStr, testInfo, fileNamePrefix, fileNameSuffix) {
-  const folderPath = getFolderPath();
   const fileName = composeFileName(fileNamePrefix, fileNameSuffix);
   const filePath = folderPath + fileName;
   await fs.writeFile(filePath, Buffer.from(fileStr, "base64"));
@@ -102,7 +98,7 @@ function getFolderPath() {
       ? config.folderPath
       : `${config.folderPath}/`;
   }
-  return fallbackFolderPath;
+  return `${appDir}/pixelpact/`;
 }
 
 function composeFileName(fileNamePrefix, suffix) {
