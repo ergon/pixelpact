@@ -5,5 +5,5 @@ pixelpact/coverage
 
 example/playwright-report
 example/test-results
-example/pixelpact/*_diff.png
-example/pixelpact/*_actual.png
+example/pixelpact/*-diff.png
+example/pixelpact/*-actual.png

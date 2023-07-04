@@ -106,5 +106,5 @@ function getFolderPath() {
 }
 
 function composeFileName(fileNamePrefix, suffix) {
-  return `${fileNamePrefix}_${suffix}.png`;
+  return `${fileNamePrefix}-${suffix}.png`;
 }
