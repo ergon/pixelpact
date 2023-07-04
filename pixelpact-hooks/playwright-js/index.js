@@ -24,10 +24,7 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
   ).data;
 
   if (config.mode === "record") {
-    const referenceFileName = composeFileName(fileNamePrefix, "expected");
-    const referenceFilePath = folderPath + referenceFileName;
-    const referenceImage = await render(mhtml, page);
-    await fs.writeFile(referenceFilePath, referenceImage);
+    await recordReferenceImage(mhtml, page);
   } else if (config.mode === "verify") {
     await verfiy(page, testInfo, fileNamePrefix, mhtml);
   } else {
@@ -35,9 +32,11 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
   }
 }
 
-async function render(actualHtml, page) {
+async function recordReferenceImage(mHtml, page) {
+  const referenceFileName = composeFileName(fileNamePrefix, "expected");
+  const referenceFilePath = folderPath + referenceFileName;
   const body = {
-    actualHtml,
+    actualHtml: mHtml,
     viewport: page.viewportSize(),
   };
 
@@ -48,13 +47,12 @@ async function render(actualHtml, page) {
   });
 
   const result = await response.json();
-  return Buffer.from(result.actual, "base64");
+  const referenceImage = Buffer.from(result.actual, "base64");
+  await fs.writeFile(referenceFilePath, referenceImage);
 }
 
 async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
-  const referenceFileName = composeFileName(fileNamePrefix, "expected");
-  const referenceFilePath = folderPath + referenceFileName;
-  const referenceImage = await fs.readFile(referenceFilePath);
+  const referenceImage = readReferenceImage(fileNamePrefix);
   const body = {
     actualHtml: mhtml,
     expected: referenceImage.toString("base64"),
@@ -68,7 +66,6 @@ async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
   });
   const result = await response.json();
 
-  saveResult(result.expected, testInfo, fileNamePrefix, "expected");
   saveResult(result.actual, testInfo, fileNamePrefix, "actual");
   saveResult(result.diff, testInfo, fileNamePrefix, "diff");
 
@@ -86,6 +83,12 @@ async function saveResult(fileStr, testInfo, fileNamePrefix, fileNameSuffix) {
     contentType: "image/png",
     path: filePath,
   });
+}
+
+async function readReferenceImage(fileNamePrefix) {
+  const referenceFileName = composeFileName(fileNamePrefix, "expected");
+  const referenceFilePath = folderPath + referenceFileName;
+  return await fs.readFile(referenceFilePath);
 }
 
 function getFolderPath() {
