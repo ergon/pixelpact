@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import { dirname, resolve } from "path";
 
 const appDir = process.env.PWD;
-const data = JSON.parse(
+const config = JSON.parse(
   readFileSync(`${appDir}/pixelpact.config.json`, {
     encoding: "utf8",
     flag: "r",
@@ -13,7 +13,7 @@ const data = JSON.parse(
 const fallbackFolderPath = `${appDir}/pixelpact/`;
 
 export async function toMatchVisually(page, testInfo, fileNamePrefix) {
-  const serverUrl = data.serverUrl;
+  const serverUrl = config.serverUrl;
   const folderPath = getFolderPath();
 
   if (!existsSync(folderPath)) {
@@ -25,12 +25,12 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
     await session.send("Page.captureSnapshot", { format: "mhtml" })
   ).data;
 
-  if (data.mode === "record") {
+  if (config.mode === "record") {
     const referenceFileName = composeFileName(fileNamePrefix, "expected");
     const referenceFilePath = folderPath + referenceFileName;
     const referenceImage = await render(mhtml, page);
     await fs.writeFile(referenceFilePath, referenceImage);
-  } else if (data.mode === "verify") {
+  } else if (config.mode === "verify") {
     await verfiy(page, testInfo, fileNamePrefix, mhtml);
   } else {
     throw Error("Unknown Mode!");
@@ -38,7 +38,7 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
 }
 
 async function render(actualHtml, page) {
-  const serverUrl = data.serverUrl;
+  const serverUrl = config.serverUrl;
 
   const body = {
     actualHtml,
@@ -56,7 +56,7 @@ async function render(actualHtml, page) {
 }
 
 async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
-  const serverUrl = data.serverUrl;
+  const serverUrl = config.serverUrl;
   const folderPath = getFolderPath();
 
   const referenceFileName = composeFileName(fileNamePrefix, "expected");
@@ -97,10 +97,10 @@ async function saveResult(fileStr, testInfo, fileNamePrefix, fileNameSuffix) {
 }
 
 function getFolderPath() {
-  if (data.folderPath) {
-    return data.folderPath.endsWith("/")
-      ? data.folderPath
-      : `${data.folderPath}/`;
+  if (config.folderPath) {
+    return config.folderPath.endsWith("/")
+      ? config.folderPath
+      : `${config.folderPath}/`;
   }
   return fallbackFolderPath;
 }
