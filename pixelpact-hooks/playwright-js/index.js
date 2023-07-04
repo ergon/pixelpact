@@ -75,7 +75,10 @@ async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
   await saveResult(result.diff, testInfo, fileNamePrefix, diffFileSuffix);
 
   if (result.numDiffPixels !== 0) {
-    throw Error("Missmatch!");
+    throw Error(
+      "Actual Image does not match reference image! Pixeldiff: " +
+        result.numDiffPixels
+    );
   }
 }
 
