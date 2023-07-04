@@ -13,7 +13,7 @@ const folderPath = getFolderPath();
 
 const expectedFileSuffix = "expected";
 const actualFileSuffix = "actual";
-const diffFileSuffix = "expected";
+const diffFileSuffix = "diff";
 
 export async function toMatchVisually(page, testInfo, fileNamePrefix) {
   const serverUrl = config.serverUrl;
