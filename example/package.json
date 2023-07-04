@@ -6,7 +6,9 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
-    "format": "npx prettier --write ."
+    "format": "npx prettier --write .",
+    "test": "playwright test",
+    "show-test-report": "playwright show-report"
   },
   "devDependencies": {
     "@playwright/test": "^1.35.1",
@@ -14,7 +16,6 @@
     "prettier": "2.8.8"
   },
   "dependencies": {
-    "@pixelpact-hook/playwright-js": "file:../pixelpact-hooks/playwright-js",
-    "tar": "^6.1.14"
+    "@pixelpact-hook/playwright-js": "1.0.0"
   }
 }
