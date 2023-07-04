@@ -1,0 +1,13 @@
+{
+  "name": "pixelpact",
+  "description": "Monorepo for all Pixelpact libraries",
+  "version": "1.0.0",
+  "author": "Ergon Informatik AG",
+  "license": "UNLICENSED",
+  "private": true,
+  "workspaces": [
+    "pixelpact",
+    "pixelpact-hooks/playwright-js",
+    "example"
+  ]
+}
