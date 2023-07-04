@@ -10,7 +10,6 @@ const data = JSON.parse(
   })
 );
 
-const mimeType = "image/png";
 const fallbackFolderPath = `${appDir}/pixelpact/`;
 
 export async function toMatchVisually(page, testInfo, fileNamePrefix) {
@@ -32,7 +31,7 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
     const referenceImage = await render(mhtml, page);
     await fs.writeFile(referenceFilePath, referenceImage);
   } else if (data.mode === "verify") {
-    await toExpect(page, testInfo, fileNamePrefix, mhtml);
+    await verfiy(page, testInfo, fileNamePrefix, mhtml);
   } else {
     throw Error("Unknown Mode!");
   }
@@ -56,7 +55,7 @@ async function render(actualHtml, page) {
   return Buffer.from(result.actual, "base64");
 }
 
-async function toExpect(page, testInfo, fileNamePrefix, mhtml) {
+async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
   const serverUrl = data.serverUrl;
   const folderPath = getFolderPath();
 
@@ -76,36 +75,25 @@ async function toExpect(page, testInfo, fileNamePrefix, mhtml) {
   });
   const result = await response.json();
 
-  const expectedFileName = composeFileName(fileNamePrefix, "expected");
-  const expectedFilePath = folderPath + expectedFileName;
-  await fs.writeFile(expectedFilePath, Buffer.from(result.expected, "base64"));
-  testInfo.attachments.push({
-    name: expectedFileName,
-    contentType: mimeType,
-    path: expectedFilePath,
-  });
-
-  const actualFileName = composeFileName(fileNamePrefix, "actual");
-  const actualFilePath = folderPath + actualFileName;
-  await fs.writeFile(actualFilePath, Buffer.from(result.actual, "base64"));
-  testInfo.attachments.push({
-    name: actualFileName,
-    contentType: mimeType,
-    path: actualFilePath,
-  });
-
-  const diffFileName = composeFileName(fileNamePrefix, "diff");
-  const diffFilePath = folderPath + diffFileName;
-  await fs.writeFile(diffFilePath, Buffer.from(result.diff, "base64"));
-  testInfo.attachments.push({
-    name: diffFileName,
-    contentType: mimeType,
-    path: diffFilePath,
-  });
+  saveResult(result.expected, testInfo, fileNamePrefix, "expected");
+  saveResult(result.actual, testInfo, fileNamePrefix, "actual");
+  saveResult(result.diff, testInfo, fileNamePrefix, "diff");
 
   if (result.numDiffPixels !== 0) {
     throw Error("Missmatch!");
   }
+}
+
+async function saveResult(fileStr, testInfo, fileNamePrefix, fileNameSuffix) {
+  const folderPath = getFolderPath();
+  const fileName = composeFileName(fileNamePrefix, fileNameSuffix);
+  const filePath = folderPath + fileName;
+  await fs.writeFile(filePath, Buffer.from(fileStr, "base64"));
+  testInfo.attachments.push({
+    name: fileName,
+    contentType: "image/png",
+    path: filePath,
+  });
 }
 
 function getFolderPath() {
