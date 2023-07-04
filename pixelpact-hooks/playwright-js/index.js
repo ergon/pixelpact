@@ -24,7 +24,7 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
   ).data;
 
   if (config.mode === "record") {
-    await recordReferenceImage(mhtml, page);
+    await recordReferenceImage(mhtml, page, fileNamePrefix);
   } else if (config.mode === "verify") {
     await verfiy(page, testInfo, fileNamePrefix, mhtml);
   } else {
@@ -32,7 +32,7 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
   }
 }
 
-async function recordReferenceImage(mHtml, page) {
+async function recordReferenceImage(mHtml, page, fileNamePrefix) {
   const referenceFileName = composeFileName(fileNamePrefix, "expected");
   const referenceFilePath = folderPath + referenceFileName;
   const body = {
