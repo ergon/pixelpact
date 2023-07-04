@@ -11,6 +11,10 @@ const config = JSON.parse(
 );
 const folderPath = getFolderPath();
 
+const expectedFileSuffix = "expected";
+const actualFileSuffix = "actual";
+const diffFileSuffix = "expected";
+
 export async function toMatchVisually(page, testInfo, fileNamePrefix) {
   const serverUrl = config.serverUrl;
 
@@ -52,7 +56,7 @@ async function recordReferenceImage(mHtml, page, fileNamePrefix) {
 }
 
 async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
-  const referenceImage = readReferenceImage(fileNamePrefix);
+  const referenceImage = await readReferenceImage(fileNamePrefix);
   const body = {
     actualHtml: mhtml,
     expected: referenceImage.toString("base64"),
@@ -66,8 +70,9 @@ async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
   });
   const result = await response.json();
 
-  saveResult(result.actual, testInfo, fileNamePrefix, "actual");
-  saveResult(result.diff, testInfo, fileNamePrefix, "diff");
+  attachExpected(testInfo, fileNamePrefix);
+  await saveResult(result.actual, testInfo, fileNamePrefix, actualFileSuffix);
+  await saveResult(result.diff, testInfo, fileNamePrefix, diffFileSuffix);
 
   if (result.numDiffPixels !== 0) {
     throw Error("Missmatch!");
@@ -78,6 +83,16 @@ async function saveResult(fileStr, testInfo, fileNamePrefix, fileNameSuffix) {
   const fileName = composeFileName(fileNamePrefix, fileNameSuffix);
   const filePath = folderPath + fileName;
   await fs.writeFile(filePath, Buffer.from(fileStr, "base64"));
+  attachToTestInfo(testInfo, fileName, filePath);
+}
+
+function attachExpected(testInfo, fileNamePrefix) {
+  const fileName = composeFileName(fileNamePrefix, expectedFileSuffix);
+  const filePath = folderPath + fileName;
+  attachToTestInfo(testInfo, fileName, filePath);
+}
+
+function attachToTestInfo(testInfo, fileName, filePath) {
   testInfo.attachments.push({
     name: fileName,
     contentType: "image/png",
@@ -86,7 +101,7 @@ async function saveResult(fileStr, testInfo, fileNamePrefix, fileNameSuffix) {
 }
 
 async function readReferenceImage(fileNamePrefix) {
-  const referenceFileName = composeFileName(fileNamePrefix, "expected");
+  const referenceFileName = composeFileName(fileNamePrefix, expectedFileSuffix);
   const referenceFilePath = folderPath + referenceFileName;
   return await fs.readFile(referenceFilePath);
 }
