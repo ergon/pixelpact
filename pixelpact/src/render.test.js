@@ -1,5 +1,4 @@
-import { ContentServer, BrowserRenderer } from "./render.js";
-import fs from "fs";
+import { BrowserRenderer } from "./render.js";
 
 describe("BrowserRenderer", () => {
   let renderer = undefined;
@@ -36,71 +35,4 @@ describe("BrowserRenderer", () => {
     expect(browser.isConnected()).toBe(false);
     expect(renderer.browser).toBeUndefined();
   });
-});
-
-describe("ContentServer", () => {
-  const anHtmlString = "<h1>Hello World</h1>";
-  let contentServer = undefined;
-
-  beforeEach(async () => {
-    contentServer = new ContentServer();
-  });
-
-  afterEach(async () => {
-    contentServer.close();
-  });
-
-  it("serves the given html content at the given url after calling start", async () => {
-    await contentServer.start(anHtmlString, "/an-url");
-
-    const response = await fetch(contentServer.url + "/an-url");
-    const content = await response.text();
-
-    expect(content).toBe(anHtmlString);
-  });
-
-  it("serves the contents of the context", async () => {
-    const tar = fs.readFileSync("testdata/context.tar.gz");
-    await contentServer.start(anHtmlString, "/", tar);
-
-    const response = await fetch(
-      contentServer.url + "/example/css/example.css"
-    );
-    const content = await response.text();
-    expect(content).toBe("body { background-color: pink; }\n");
-  });
-});
-
-function toExist(actual) {
-  const pass = fs.existsSync(actual);
-  return {
-    message: () => `expected ${actual} to exist`,
-    pass: pass,
-  };
-}
-
-function toHaveContent(file, expected) {
-  const actual = fs.readFileSync(file).toString();
-  const pass = actual === expected;
-  return {
-    message: () =>
-      `expected ${file} to contain ${this.utils.printExpected(
-        expected
-      )} but was ${this.utils.printReceived(actual)}`,
-    pass: pass,
-  };
-}
-
-function toNotExist(actual) {
-  const pass = !fs.existsSync(actual);
-  return {
-    message: () => `expected ${this.utils.printReceived(actual)} to NOT exist`,
-    pass: pass,
-  };
-}
-
-expect.extend({
-  toExist,
-  toNotExist,
-  toHaveContent,
 });

@@ -23,8 +23,6 @@ export function buildFastify(renderFn, compareFn) {
     properties: {
       expected: { type: "string" },
       actualHtml: { type: "string" },
-      content: { type: "string" },
-      url: { type: "string" },
       fullpage: { type: "boolean" },
       viewport: { $ref: "#viewport" },
     },
@@ -36,8 +34,6 @@ export function buildFastify(renderFn, compareFn) {
     type: "object",
     properties: {
       actualHtml: { type: "string" },
-      context: { type: "string" },
-      url: { type: "string" },
       fullpage: { type: "boolean" },
       viewport: { $ref: "#viewport" },
     },
@@ -54,19 +50,9 @@ export function buildFastify(renderFn, compareFn) {
       const expected = Buffer.from(request.body.expected, "base64");
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
-      const url = request.body.url ?? "/";
       const fullpage = request.body.fullpage ?? false;
-      const context = request.body.context
-        ? Buffer.from(request.body.context, "base64")
-        : null;
 
-      const actual = await renderFn(
-        actualHtml,
-        url,
-        viewport,
-        fullpage,
-        context
-      );
+      const actual = await renderFn(actualHtml, viewport, fullpage);
       const result = await compareFn(expected, actual);
 
       return {
@@ -87,19 +73,9 @@ export function buildFastify(renderFn, compareFn) {
     handler: async (request) => {
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
-      const url = request.body.url ?? "/";
       const fullpage = request.body.fullpage ?? false;
-      const context = request.body.context
-        ? Buffer.from(request.body.context, "base64")
-        : null;
 
-      const actual = await renderFn(
-        actualHtml,
-        url,
-        viewport,
-        fullpage,
-        context
-      );
+      const actual = await renderFn(actualHtml, viewport, fullpage);
 
       return {
         actual: actual.toString("base64"),

@@ -1,16 +1,14 @@
 import fs from "fs/promises";
-import tar from "tar";
 
 class PixelpactClient {
   constructor(baseUrl) {
     this.baseUrl = baseUrl;
   }
 
-  async render(actualHtml, context) {
+  async render(actualHtml) {
     const body = {
       actualHtml,
       viewport: { width: 1920, height: 1024 },
-      context: context.toString("base64"),
     };
 
     const response = await fetch(`${this.baseUrl}/render`, {
@@ -24,12 +22,11 @@ class PixelpactClient {
     return Buffer.from(result.actual, "base64");
   }
 
-  async checkReferenceImage(actualHtml, referenceImage, context) {
+  async checkReferenceImage(actualHtml, referenceImage) {
     const body = {
       actualHtml,
       expected: referenceImage.toString("base64"),
       viewport: { width: 1920, height: 1024 },
-      context: context.toString("base64"),
     };
 
     const response = await fetch(`${this.baseUrl}/check`, {
@@ -49,14 +46,10 @@ class PixelpactClient {
   }
 }
 
-async function checkReferenceImage(client, actualHtml, context) {
+async function checkReferenceImage(client, actualHtml) {
   const referenceImage = await fs.readFile("screenshots/index-reference.png");
 
-  const result = await client.checkReferenceImage(
-    actualHtml,
-    referenceImage,
-    context
-  );
+  const result = await client.checkReferenceImage(actualHtml, referenceImage);
 
   await fs.writeFile("screenshots/index-actual.png", result.actual);
   await fs.writeFile("screenshots/index-diff.png", result.diff);
@@ -64,39 +57,21 @@ async function checkReferenceImage(client, actualHtml, context) {
   console.log(`Pixel difference was: ${result.numDiffPixels}`);
 }
 
-async function updateReferenceImage(client, actualHtml, context) {
-  const result = await client.render(actualHtml, context);
+async function updateReferenceImage(client, actualHtml) {
+  const result = await client.render(actualHtml);
   await fs.writeFile("screenshots/index-reference.png", result);
-}
-
-async function prepareContext() {
-  return await new Promise((resolve, reject) => {
-    const readable = tar.create(
-      {
-        gzip: true,
-      },
-      ["example.css"]
-    );
-    const parts = [];
-    readable.on("data", (data) => parts.push(data));
-    readable.on("error", (error) => reject(error));
-    readable.on("end", () => {
-      resolve(Buffer.concat(parts));
-    });
-  });
 }
 
 async function main() {
   const args = process.argv.slice(2);
   const client = new PixelpactClient("http://0.0.0.0:8888");
 
-  const actualHtml = (await fs.readFile("index.html")).toString();
-  const context = await prepareContext();
+  const actualHtml = (await fs.readFile("index.mhtml")).toString();
 
   if (args.length > 0 && args[0] === "update") {
-    await updateReferenceImage(client, actualHtml, context);
+    await updateReferenceImage(client, actualHtml);
   } else {
-    await checkReferenceImage(client, actualHtml, context);
+    await checkReferenceImage(client, actualHtml);
   }
 }
 
