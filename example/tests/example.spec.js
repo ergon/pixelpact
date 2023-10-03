@@ -11,7 +11,7 @@ test.use({
 
 import fs from "fs/promises";
 
-test("test login page", async ({ page, browser }, testInfo) => {
+test("verify site visually", async ({ page, browser }, testInfo) => {
   await page.goto("https://www.ergon.ch/de/themen", {
     waitUntil: "networkidle",
   });
