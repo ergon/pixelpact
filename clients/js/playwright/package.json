@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Pixelpact Playwright helps to easily hook into Pixelpact Service",
   "type": "module",
+  "author": "Ergon Informatik AG",
+  "license": "MIT",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "MIT"
+  }
 }
