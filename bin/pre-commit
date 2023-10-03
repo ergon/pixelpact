@@ -7,11 +7,7 @@ if [[ "${TRACE-0}" == "1" ]]; then
   set -o xtrace
 fi
 
-pushd pixelpact
-npm run format
-popd
-
-pushd "example"
+pushd server
 npm run format
 popd
 

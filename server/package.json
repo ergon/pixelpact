@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Pixelpact gets you started quickly with visual testing for the web.",
   "type": "module",
+  "author": "Ergon Informatik AG",
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
