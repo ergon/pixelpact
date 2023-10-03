@@ -50,14 +50,14 @@ describe("api", () => {
       expect(body.message).toBe("body must have required property 'expected'");
     });
 
-    it("returns result when all parameters are provided", async () => {
+    it("returns result when all parameters are provided", async (page) => {
       const response = await app.inject({
         method: "POST",
         url: "/check",
         payload: {
           actualHtml: "<h1>Hello World</h1>",
           expected: expected,
-          viewport: { width: 1920, height: 1024 },
+          viewport: page.viewportSize(),
         },
       });
 
@@ -93,13 +93,13 @@ describe("api", () => {
       );
     });
 
-    it("returns result when all parameters are provided", async () => {
+    it("returns result when all parameters are provided", async (page) => {
       const response = await app.inject({
         method: "POST",
         url: "/render",
         payload: {
           actualHtml: "<h1>Hello World</h1>",
-          viewport: { width: 1920, height: 1024 },
+          viewport: page.viewportSize(),
         },
       });
 

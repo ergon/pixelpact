@@ -14,33 +14,37 @@ describe("check integration test", () => {
     await instance.close();
   });
 
-  it("succeeds when calling check with the reference image generated using render", async () => {
+  it("succeeds when calling check with the reference image generated using render", async (page) => {
     const htmlContent = await mhtmlOf("<h1>Hello World</h1>");
-    const reference = await render(htmlContent);
+    const reference = await render(htmlContent, page.viewportSize());
 
-    const result = await check(htmlContent, reference);
+    const result = await check(htmlContent, reference, page.viewportSize());
 
     expect(result.expected).toBe(reference);
     expect(result.actual).toBe(reference);
     expect(result.numDiffPixels).toBe(0);
   });
 
-  it("fails when calling check with a reference obtained from a different HTML content", async () => {
-    const reference = await render(await mhtmlOf("<h1>Hello Jack</h1>"));
-    const result = await check(await mhtmlOf("<h1>Hello Jill</h1>"), reference);
+  it("fails when calling check with a reference obtained from a different HTML content", async (page) => {
+    const reference = await render(
+      await mhtmlOf("<h1>Hello Jack</h1>"),
+      page.viewportSize()
+    );
+    const result = await check(
+      await mhtmlOf("<h1>Hello Jill</h1>"),
+      reference,
+      page.viewportSize()
+    );
     expect(result.expected).toBe(reference);
     expect(result.actual).not.toBe(reference);
     expect(result.numDiffPixels).toBeGreaterThan(0);
   });
 
-  async function render(actualHtml) {
+  async function render(actualHtml, viewport) {
     const response = await fetch(`${baseUrl}/render`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        actualHtml,
-        viewport: { width: 1920, height: 1024 },
-      }),
+      body: JSON.stringify({ actualHtml, viewport }),
     });
 
     expect(response.status).toBe(200);
@@ -51,15 +55,11 @@ describe("check integration test", () => {
     return body.actual;
   }
 
-  async function check(actualHtml, expected) {
+  async function check(actualHtml, expected, viewport) {
     const response = await fetch(`${baseUrl}/check`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        actualHtml,
-        expected,
-        viewport: { width: 1920, height: 1024 },
-      }),
+      body: JSON.stringify({ actualHtml, expected, viewport }),
     });
 
     const body = await response.json();

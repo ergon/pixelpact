@@ -10,6 +10,7 @@ import { devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 const config = {
+  viewport: { width: 1920, height: 1024 },
   testDir: "./tests",
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,

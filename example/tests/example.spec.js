@@ -2,7 +2,6 @@ import { test } from "@playwright/test";
 import { toMatchVisually } from "@pixelpact-hook/playwright-js";
 
 test.use({
-  viewport: { width: 1920, height: 1024 },
   locale: "de-CH",
   video: "on",
   trace: "on",
