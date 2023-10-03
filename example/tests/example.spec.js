@@ -11,9 +11,12 @@ test.use({
 import fs from "fs/promises";
 
 test("verify site visually", async ({ page, browser }, testInfo) => {
-  await page.goto("https://www.ergon.ch/de/themen", {
-    waitUntil: "networkidle",
-  });
+  await page.goto(
+    "https://web.archive.org/web/20230801105641/https://www.ergon.ch/de/themen",
+    {
+      waitUntil: "networkidle",
+    }
+  );
 
-  await toMatchVisually(page, testInfo, "ErgonWebsite");
+  await toMatchVisually(page, testInfo, "ArchivedErgonWebsite");
 });
