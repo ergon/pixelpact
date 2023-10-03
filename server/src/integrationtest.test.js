@@ -14,26 +14,28 @@ describe("check integration test", () => {
     await instance.close();
   });
 
-  it("succeeds when calling check with the reference image generated using render", async (page) => {
+  it("succeeds when calling check with the reference image generated using render", async () => {
+    const viewport = { width: 1920, height: 1024 };
     const htmlContent = await mhtmlOf("<h1>Hello World</h1>");
-    const reference = await render(htmlContent, page.viewportSize());
+    const reference = await render(htmlContent, viewport);
 
-    const result = await check(htmlContent, reference, page.viewportSize());
+    const result = await check(htmlContent, reference, viewport);
 
     expect(result.expected).toBe(reference);
     expect(result.actual).toBe(reference);
     expect(result.numDiffPixels).toBe(0);
   });
 
-  it("fails when calling check with a reference obtained from a different HTML content", async (page) => {
+  it("fails when calling check with a reference obtained from a different HTML content", async () => {
+    const viewport = { width: 1920, height: 1024 };
     const reference = await render(
       await mhtmlOf("<h1>Hello Jack</h1>"),
-      page.viewportSize()
+      viewport
     );
     const result = await check(
       await mhtmlOf("<h1>Hello Jill</h1>"),
       reference,
-      page.viewportSize()
+      viewport
     );
     expect(result.expected).toBe(reference);
     expect(result.actual).not.toBe(reference);
