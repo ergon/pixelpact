@@ -1,14 +1,10 @@
-import { readFileSync, existsSync, mkdirSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import fs from "fs/promises";
-import { dirname, resolve } from "path";
 
 const appDir = process.env.PWD;
-const config = JSON.parse(
-  readFileSync(`${appDir}/pixelpact.config.json`, {
-    encoding: "utf8",
-    flag: "r",
-  })
-);
+const MODE = process.env.PIXELPACT_MODE ?? "verify";
+const SERVER_URL = process.env.PIXELPACT_SERVER_URL ?? "http://localhost:8888";
+const FOLDER_PATH = process.env.PIXELPACT_FOLDER_PATH;
 const folderPath = getFolderPath();
 
 const expectedFileSuffix = "expected";
@@ -16,8 +12,6 @@ const actualFileSuffix = "actual";
 const diffFileSuffix = "diff";
 
 export async function toMatchVisually(page, testInfo, fileNamePrefix) {
-  const serverUrl = config.serverUrl;
-
   if (!existsSync(folderPath)) {
     mkdirSync(folderPath);
   }
@@ -27,9 +21,9 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
     await session.send("Page.captureSnapshot", { format: "mhtml" })
   ).data;
 
-  if (config.mode === "record") {
+  if (MODE === "record") {
     await recordReferenceImage(mhtml, page, fileNamePrefix);
-  } else if (config.mode === "verify") {
+  } else if (MODE === "verify") {
     await verfiy(page, testInfo, fileNamePrefix, mhtml);
   } else {
     throw Error("Unknown Mode!");
@@ -44,7 +38,7 @@ async function recordReferenceImage(mHtml, page, fileNamePrefix) {
     viewport: page.viewportSize(),
   };
 
-  const response = await fetch(`${config.serverUrl}/render`, {
+  const response = await fetch(`${SERVER_URL}/render`, {
     method: "post",
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
@@ -63,7 +57,7 @@ async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
     viewport: page.viewportSize(),
   };
 
-  const response = await fetch(config.serverUrl + "/check", {
+  const response = await fetch(SERVER_URL + "/check", {
     method: "post",
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
@@ -110,10 +104,8 @@ async function readReferenceImage(fileNamePrefix) {
 }
 
 function getFolderPath() {
-  if (config.folderPath) {
-    return config.folderPath.endsWith("/")
-      ? config.folderPath
-      : `${config.folderPath}/`;
+  if (FOLDER_PATH) {
+    return FOLDER_PATH.endsWith("/") ? FOLDER_PATH : `${FOLDER_PATH}/`;
   }
   return `${appDir}/pixelpact/`;
 }
