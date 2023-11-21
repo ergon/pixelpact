@@ -11,7 +11,12 @@ const expectedFileSuffix = "expected";
 const actualFileSuffix = "actual";
 const diffFileSuffix = "diff";
 
-export async function toMatchVisually(page, testInfo, fileNamePrefix) {
+export async function toMatchVisually(
+  page,
+  testInfo,
+  fileNamePrefix,
+  options = {}
+) {
   if (!existsSync(folderPath)) {
     mkdirSync(folderPath);
   }
@@ -22,20 +27,21 @@ export async function toMatchVisually(page, testInfo, fileNamePrefix) {
   ).data;
 
   if (MODE === "record") {
-    await recordReferenceImage(mhtml, page, fileNamePrefix);
+    await recordReferenceImage(mhtml, page, fileNamePrefix, options);
   } else if (MODE === "verify") {
-    await verfiy(page, testInfo, fileNamePrefix, mhtml);
+    await verfiy(page, testInfo, fileNamePrefix, mhtml, options);
   } else {
     throw Error("Unknown Mode!");
   }
 }
 
-async function recordReferenceImage(mHtml, page, fileNamePrefix) {
+async function recordReferenceImage(mHtml, page, fileNamePrefix, options) {
   const referenceFileName = composeFileName(fileNamePrefix, "expected");
   const referenceFilePath = folderPath + referenceFileName;
   const body = {
     actualHtml: mHtml,
     viewport: page.viewportSize(),
+    ...options,
   };
 
   const response = await fetch(`${SERVER_URL}/render`, {
@@ -49,12 +55,13 @@ async function recordReferenceImage(mHtml, page, fileNamePrefix) {
   await fs.writeFile(referenceFilePath, referenceImage);
 }
 
-async function verfiy(page, testInfo, fileNamePrefix, mhtml) {
+async function verfiy(page, testInfo, fileNamePrefix, mhtml, options) {
   const referenceImage = await readReferenceImage(fileNamePrefix);
   const body = {
     actualHtml: mhtml,
     expected: referenceImage.toString("base64"),
     viewport: page.viewportSize(),
+    ...options,
   };
 
   const response = await fetch(SERVER_URL + "/check", {
