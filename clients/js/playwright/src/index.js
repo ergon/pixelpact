@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync } from "fs";
 import fs from "fs/promises";
+import {request} from '@playwright/test'; // Dependency to playwright is implied by using this project
 
 const appDir = process.env.PWD;
 const MODE = process.env.PIXELPACT_MODE ?? "verify";
@@ -44,9 +45,10 @@ async function recordReferenceImage(mHtml, page, fileNamePrefix, options) {
     ...options,
   };
 
-  const response = await fetch(`${SERVER_URL}/render`, {
+  const requestContext = await request.newContext()
+  const response = await requestContext.fetch(`${SERVER_URL}/render`, {
     method: "post",
-    body: JSON.stringify(body),
+    data: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
   });
 
@@ -64,9 +66,10 @@ async function verfiy(page, testInfo, fileNamePrefix, mhtml, options) {
     ...options,
   };
 
-  const response = await fetch(SERVER_URL + "/check", {
+  const requestContext = await request.newContext()
+  const response = await requestContext.fetch(SERVER_URL + "/check", {
     method: "post",
-    body: JSON.stringify(body),
+    data: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
   });
   const result = await response.json();
