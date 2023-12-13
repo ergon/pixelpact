@@ -30,12 +30,12 @@ describe("check integration test", () => {
     const viewport = { width: 1920, height: 1024 };
     const reference = await render(
       await mhtmlOf("<h1>Hello Jack</h1>"),
-      viewport
+      viewport,
     );
     const result = await check(
       await mhtmlOf("<h1>Hello Jill</h1>"),
       reference,
-      viewport
+      viewport,
     );
     expect(result.expected).toBe(reference);
     expect(result.actual).not.toBe(reference);

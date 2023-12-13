@@ -11,7 +11,7 @@ export async function compare(expected, actual, options = { threshold: 0.01 }) {
     diffPng.data,
     width,
     height,
-    options
+    options,
   );
   const diff = PNG.sync.write(diffPng);
 

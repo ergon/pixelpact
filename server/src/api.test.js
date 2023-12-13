@@ -31,7 +31,7 @@ describe("api", () => {
 
       const body = JSON.parse(response.body);
       expect(body.message).toBe(
-        "body must have required property 'actualHtml'"
+        "body must have required property 'actualHtml'",
       );
     });
 
@@ -89,7 +89,7 @@ describe("api", () => {
 
       const body = JSON.parse(response.body);
       expect(body.message).toBe(
-        "body must have required property 'actualHtml'"
+        "body must have required property 'actualHtml'",
       );
     });
 

@@ -11,7 +11,7 @@ const logger = pino({
 export async function render(actualHtml, viewport, fullpage) {
   const renderer = new BrowserRenderer();
   const workspaceDirectory = await fs.mkdtemp(
-    path.join(os.tmpdir(), "pixelpact-")
+    path.join(os.tmpdir(), "pixelpact-"),
   );
   const indexFile = `${workspaceDirectory}/index.mhtml`;
   await fs.writeFile(indexFile, actualHtml);
