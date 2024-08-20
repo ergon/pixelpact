@@ -1,6 +1,11 @@
 import fastify from "fastify";
 import { compare } from "./compare.js";
 import { render } from "./render.js";
+import pino from "pino";
+
+const logger = pino({
+  level: process.env.LOG_LEVEL || "info",
+});
 
 export function buildFastify(renderFn, compareFn) {
   const server = fastify({
@@ -25,6 +30,7 @@ export function buildFastify(renderFn, compareFn) {
       actualHtml: { type: "string" },
       fullpage: { type: "boolean" },
       viewport: { $ref: "#viewport" },
+      style: { type: "string" },
     },
     required: ["actualHtml", "expected", "viewport"],
   });
@@ -36,6 +42,7 @@ export function buildFastify(renderFn, compareFn) {
       actualHtml: { type: "string" },
       fullpage: { type: "boolean" },
       viewport: { $ref: "#viewport" },
+      style: { type: "string" },
     },
     required: ["actualHtml", "viewport"],
   });
@@ -51,8 +58,9 @@ export function buildFastify(renderFn, compareFn) {
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
       const fullpage = request.body.fullpage ?? false;
+      const style = request.body.style;
 
-      const actual = await renderFn(actualHtml, viewport, fullpage);
+      const actual = await renderFn(actualHtml, viewport, fullpage, style);
       const result = await compareFn(expected, actual);
 
       return {
@@ -74,13 +82,24 @@ export function buildFastify(renderFn, compareFn) {
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
       const fullpage = request.body.fullpage ?? false;
+      const style = request.body.style;
 
-      const actual = await renderFn(actualHtml, viewport, fullpage);
+      const actual = await renderFn(actualHtml, viewport, fullpage, style);
 
       return {
         actual: actual.toString("base64"),
       };
     },
+  });
+
+  server.setErrorHandler((error, request, reply) => {
+    logger.error(error.message);
+    const errorResponse = {
+      message: error.message,
+      error: error.error,
+      statusCode: error.statusCode || 500,
+    };
+    reply.code(errorResponse.statusCode).send(errorResponse);
   });
 
   return server;

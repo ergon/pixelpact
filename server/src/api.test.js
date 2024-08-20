@@ -58,6 +58,7 @@ describe("api", () => {
           actualHtml: "<h1>Hello World</h1>",
           expected: expected,
           viewport: { width: 1920, height: 1024 },
+          style: "svg { visibility: hidden; }",
         },
       });
 
@@ -100,6 +101,7 @@ describe("api", () => {
         payload: {
           actualHtml: "<h1>Hello World</h1>",
           viewport: { width: 1920, height: 1024 },
+          style: "svg { visibility: hidden; }",
         },
       });
 

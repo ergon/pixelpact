@@ -32,13 +32,13 @@ export class BrowserRenderer {
     logger.debug("Rendering browser started");
   }
 
-  async screenshot(url, viewport, fullPage) {
+  async screenshot(url, viewport, fullPage, style) {
     logger.debug("Creating screenshot", { url });
     const page = await this.browser.newPage({ viewport });
     logger.debug("Waiting for page to load", { url });
     await page.goto(url);
     logger.debug(`Page loaded`, { url });
-    const screenshot = await page.screenshot({ fullPage });
+    const screenshot = await page.screenshot({ fullPage, style });
     logger.debug(`Screenshot taken`);
     return screenshot;
   }
