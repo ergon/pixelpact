@@ -21,11 +21,14 @@
         buildInputs = with pkgs; [nodejs start-server start-server-docker];
         shellHook = ''
           export REPOSITORY_ROOT=$(pwd)
+          playwright_chromium_revision="$(${pkgs.jq}/bin/jq --raw-output '.browsers[] | select(.name == "chromium").revision' ${pkgs.playwright-driver}/package/browsers.json)"
+          export PLAYWRIGHT_CHROME_EXECUTABLE_PATH="${pkgs.playwright-driver.browsers}/chromium-$playwright_chromium_revision/chrome-linux/chrome";
+          export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
+          export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS
           ln -fs "$REPOSITORY_ROOT/bin/pre-commit" "$REPOSITORY_ROOT/.git/hooks/pre-commit"
         '';
       };
 
-      # enable formatting via `nix fmt`
-      formatter = pkgs.alejandra; # or nixpkgs-fmt;
+      formatter = pkgs.alejandra;
     });
 }
