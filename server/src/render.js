@@ -8,7 +8,7 @@ const logger = pino({
   level: process.env.LOG_LEVEL || "info",
 });
 
-export async function render(actualHtml, viewport, fullpage) {
+export async function render(actualHtml, viewport, fullpage, style) {
   const renderer = new BrowserRenderer();
   const workspaceDirectory = await fs.mkdtemp(
     path.join(os.tmpdir(), "pixelpact-"),
@@ -17,7 +17,7 @@ export async function render(actualHtml, viewport, fullpage) {
   await fs.writeFile(indexFile, actualHtml);
   try {
     await renderer.start();
-    return await renderer.screenshot(`file://${indexFile}`, viewport, fullpage);
+    return await renderer.screenshot(`file://${indexFile}`, viewport, fullpage, style);
   } finally {
     await fs.rm(indexFile);
     await fs.rmdir(workspaceDirectory);
