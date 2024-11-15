@@ -17,7 +17,12 @@ export async function render(actualMhtml, viewport, fullpage, style) {
   await fs.writeFile(indexFile, actualMhtml);
   try {
     await renderer.start();
-    return await renderer.screenshot(`file://${indexFile}`, viewport, fullpage, style);
+    return await renderer.screenshot(
+      `file://${indexFile}`,
+      viewport,
+      fullpage,
+      style,
+    );
   } finally {
     await fs.rm(indexFile);
     await fs.rmdir(workspaceDirectory);
