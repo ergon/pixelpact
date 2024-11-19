@@ -3,18 +3,36 @@ import path from "node:path";
 import os from "node:os";
 import { chromium } from "playwright";
 import pino from "pino";
+import mhtml2html from "mhtml2html";
+import { JSDOM } from "jsdom";
 
 const logger = pino({
   level: process.env.LOG_LEVEL || "info",
 });
 
-export async function render(actualMhtml, viewport, fullpage, style) {
+export async function render(
+  actualMhtml,
+  viewport,
+  fullpage,
+  style,
+  usehMhtmlConverter,
+) {
   const renderer = new BrowserRenderer();
   const workspaceDirectory = await fs.mkdtemp(
     path.join(os.tmpdir(), "pixelpact-"),
   );
-  const indexFile = `${workspaceDirectory}/index.mhtml`;
-  await fs.writeFile(indexFile, actualMhtml);
+  let indexFile;
+  if (usehMhtmlConverter) {
+    indexFile = `${workspaceDirectory}/index.html`;
+    const convertedHtml = mhtml2html.convert(actualMhtml, {
+      parseDOM: (html) => new JSDOM(html),
+    });
+    const actualHtml = convertedHtml.serialize();
+    await fs.writeFile(indexFile, actualHtml);
+  } else {
+    indexFile = `${workspaceDirectory}/index.mhtml`;
+    await fs.writeFile(indexFile, actualMhtml);
+  }
   try {
     await renderer.start();
     return await renderer.screenshot(
