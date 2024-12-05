@@ -31,6 +31,7 @@ export function buildFastify(renderFn, compareFn) {
       fullpage: { type: "boolean" },
       viewport: { $ref: "#viewport" },
       style: { type: "string" },
+      usehMhtmlConverter: { type: "boolean" },
     },
     required: ["actualHtml", "expected", "viewport"],
   });
@@ -43,6 +44,7 @@ export function buildFastify(renderFn, compareFn) {
       fullpage: { type: "boolean" },
       viewport: { $ref: "#viewport" },
       style: { type: "string" },
+      usehMhtmlConverter: { type: "boolean" },
     },
     required: ["actualHtml", "viewport"],
   });
@@ -59,8 +61,15 @@ export function buildFastify(renderFn, compareFn) {
       const viewport = request.body.viewport;
       const fullpage = request.body.fullpage ?? false;
       const style = request.body.style;
+      const usehMhtmlConverter = request.body.usehMhtmlConverter ?? false;
 
-      const actual = await renderFn(actualHtml, viewport, fullpage, style);
+      const actual = await renderFn(
+        actualHtml,
+        viewport,
+        fullpage,
+        style,
+        usehMhtmlConverter,
+      );
       const result = await compareFn(expected, actual);
 
       return {
@@ -83,8 +92,15 @@ export function buildFastify(renderFn, compareFn) {
       const viewport = request.body.viewport;
       const fullpage = request.body.fullpage ?? false;
       const style = request.body.style;
+      const usehMhtmlConverter = request.body.usehMhtmlConverter ?? false;
 
-      const actual = await renderFn(actualHtml, viewport, fullpage, style);
+      const actual = await renderFn(
+        actualHtml,
+        viewport,
+        fullpage,
+        style,
+        usehMhtmlConverter,
+      );
 
       return {
         actual: actual.toString("base64"),
