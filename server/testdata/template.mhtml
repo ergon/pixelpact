@@ -18,14 +18,30 @@ Content-Location: http://localhost:8000/
 ntent=3D"text/html; charset=3DUTF-8">
    =20
     <meta http-equiv=3D"X-UA-Compatible" content=3D"IE=3Dedge">
-    <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=
+    <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale
 =3D1.0">
     <link rel=3D"stylesheet" href=3D"http://localhost:8000/example.css">
     <title>Document</title>
   </head>
   <body>
     <h1>Hello World</h1>
- =20
+
+    <form action=3D"http://localhost:8000/submit" method=3D"post">
+      <label for=3D"name">Name:</label>
+      <input type=3D"text" id=3D"name" name=3D"name"><br><br>
+
+      <label for=3D"age">Age:</label>
+      <input type=3D"number" id=3D"age" name=3D"age"><br><br>
+
+      <label for=3D"dob">Date of Birth:</label>
+      <input type=3D"date" id=3D"dob" name=3D"dob"><br><br>
+
+      <label for=3D"message">Message:</label><br>
+      <textarea id=3D"message" name=3D"message" rows=3D"4" cols=3D"50"></textarea><br><br>
+
+      <button type=3D"submit">Submit</button>
+      <button type=3D"reset">Reset</button>
+    </form>
 
 </body></html>
 ------MultipartBoundary--mJEnOoe6QIyy5FUC8dMc2jWfHPkkc7zRmcu5QqHSL4----
@@ -36,4 +52,17 @@ Content-Location: http://localhost:8000/example.css
 @charset "utf-8";
 
 body { background-color: pink; }
+
+form {
+  margin: 20px;
+  padding: 10px;
+  border: 2px solid black;
+  background-color: white;
+}
+
+input, textarea, button {
+  margin: 10px 0;
+  padding: 5px;
+  font-size: 1rem;
+}
 ------MultipartBoundary--mJEnOoe6QIyy5FUC8dMc2jWfHPkkc7zRmcu5QqHSL4------

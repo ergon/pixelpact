@@ -10,7 +10,7 @@ describe("compare", () => {
 
     const result = await compare(expected, actual);
 
-    expect(result.numDiffPixels).toBe(152);
+    expect(result.numDiffPixels).toBe(64264);
     expect(result.expected).toStrictEqual(expected);
     expect(result.actual).toStrictEqual(actual);
     expect(result.diff).toStrictEqual(expectedDiff);
