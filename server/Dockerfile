@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.48.2-focal
+FROM mcr.microsoft.com/playwright:v1.49.1-noble
 
 WORKDIR /workspace
 ADD package.json /workspace/
