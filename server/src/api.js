@@ -61,7 +61,7 @@ export function buildFastify(renderFn, compareFn) {
       const viewport = request.body.viewport;
       const fullpage = request.body.fullpage ?? false;
       const style = request.body.style;
-      const usehMhtmlConverter = request.body.usehMhtmlConverter ?? false;
+      const usehMhtmlConverter = request.body.usehMhtmlConverter ?? true;
 
       const actual = await renderFn(
         actualHtml,
@@ -92,7 +92,7 @@ export function buildFastify(renderFn, compareFn) {
       const viewport = request.body.viewport;
       const fullpage = request.body.fullpage ?? false;
       const style = request.body.style;
-      const usehMhtmlConverter = request.body.usehMhtmlConverter ?? false;
+      const usehMhtmlConverter = request.body.usehMhtmlConverter ?? true;
 
       const actual = await renderFn(
         actualHtml,
