@@ -21,5 +21,15 @@
       ],
       "automerge": true
     }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["flake\\.nix$"],
+      "matchStrings": [
+        "playwright\\.url\\s*=\\s*\"github:pietdevries94/playwright-web-flake/(?<currentValue>[^\"]+)\";"
+      ],
+      "datasourceTemplate": "npm",
+      "depNameTemplate": "playwright"
+    }
   ]
 }
