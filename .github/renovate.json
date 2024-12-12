@@ -31,5 +31,12 @@
       "datasourceTemplate": "npm",
       "depNameTemplate": "playwright"
     }
-  ]
+  ],
+  "nix": {
+    "enabled": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "extends": ["schedule:weekly"]
+  }
 }
