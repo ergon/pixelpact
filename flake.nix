@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     flake-utils.url = "github:numtide/flake-utils";
-    playwright.url = "github:pietdevries94/playwright-web-flake/1.53.0";
+    playwright.url = "github:pietdevries94/playwright-web-flake/1.53.1";
   };
 
   outputs = {
