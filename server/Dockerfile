@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.54.0-noble
+FROM mcr.microsoft.com/playwright:v1.54.1-noble
 
 WORKDIR /workspace
 ADD package.json /workspace/
