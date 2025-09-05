@@ -17,7 +17,7 @@
     "@playwright/test": "1.55.0",
     "fastify": "5.6.0",
     "mhtml2html": "3.0.0",
-    "pino": "9.9.2",
+    "pino": "9.9.4",
     "pixelmatch": "7.1.0",
     "playwright": "1.55.0",
     "pngjs": "7.0.0",
