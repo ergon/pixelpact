@@ -21,7 +21,7 @@
     "pixelmatch": "7.1.0",
     "playwright": "1.55.0",
     "pngjs": "7.0.0",
-    "tar": "7.4.3"
+    "tar": "7.4.4"
   },
   "devDependencies": {
     "jest": "30.1.3",
