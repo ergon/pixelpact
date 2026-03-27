@@ -38,16 +38,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1734083684,
-        "narHash": "sha256-5fNndbndxSx5d+C/D0p/VF32xDiJCJzyOqorOYW4JEo=",
+        "lastModified": 1758589230,
+        "narHash": "sha256-zMTCFGe8aVGTEr2RqUi/QzC1nOIQ0N1HRsbqB4f646k=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "314e12ba369ccdb9b352a4db26ff419f7c49fa84",
+        "rev": "d1d883129b193f0b495d75c148c2c3a7d95789a0",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-24.11",
+        "ref": "nixos-25.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -70,16 +70,16 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1734009196,
-        "narHash": "sha256-SuRbOfPfpfKOzyWh2NzPjMEd1tACcwFstgnyo3KGvII=",
+        "lastModified": 1758760208,
+        "narHash": "sha256-6szJyS0x9Z5C0W7NViajcvPpMAjDeqZbi3tNOBJElQM=",
         "owner": "pietdevries94",
         "repo": "playwright-web-flake",
-        "rev": "e9b8178bde33be9fdd166d08abb230befdd71b61",
+        "rev": "d8f3e755b1c5f0db8ce9e63c9b893dff2b678786",
         "type": "github"
       },
       "original": {
         "owner": "pietdevries94",
-        "ref": "1.49.1",
+        "ref": "1.55.1",
         "repo": "playwright-web-flake",
         "type": "github"
       }
