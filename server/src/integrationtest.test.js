@@ -1,4 +1,4 @@
-import { startApiServer } from "./api";
+import { startApiServer } from "./api.js";
 import { getLocalAddress } from "./helpers.js";
 import fs from "fs/promises";
 
