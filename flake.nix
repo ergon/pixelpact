@@ -2,7 +2,7 @@
   description = "Pixelpact Project Flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.zst";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -15,12 +15,12 @@
       pkgs = import nixpkgs {
         inherit system;
       };
-      nodejs = pkgs.nodejs_20;
+      nodejs = pkgs.nodejs;
       start-server = pkgs.writeShellScriptBin "start-server" ''cd $REPOSITORY_ROOT/pixelpact; npm run start'';
       start-server-docker = pkgs.writeShellScriptBin "start-server-docker" ''cd $REPOSITORY_ROOT/pixelpact; docker compose up --build'';
     in {
       devShells.default = pkgs.mkShellNoCC {
-        buildInputs = with pkgs; [nodejs start-server start-server-docker];
+        buildInputs = [nodejs start-server start-server-docker];
         shellHook = ''
           export REPOSITORY_ROOT=$(pwd)
           export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
