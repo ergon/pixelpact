@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync } from "fs";
 import fs from "fs/promises";
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 const appDir = process.env.PWD;
 const MODE = process.env.PIXELPACT_MODE ?? "verify";
@@ -16,7 +16,7 @@ export async function toMatchVisually(
   page,
   testInfo,
   fileNamePrefix,
-  options = {}
+  options = {},
 ) {
   if (!existsSync(folderPath)) {
     mkdirSync(folderPath);
@@ -79,7 +79,7 @@ async function verfiy(page, testInfo, fileNamePrefix, mhtml, options) {
   if (result.numDiffPixels !== 0) {
     throw Error(
       "Actual Image does not match reference image! Pixeldiff: " +
-        result.numDiffPixels
+        result.numDiffPixels,
     );
   }
 }
