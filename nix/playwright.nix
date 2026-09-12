@@ -43,8 +43,6 @@ in {
 
   # Playwright only validates host requirements and needs the shared libs on linux.
   config = lib.mkIf (cfg.enable && pkgs.stdenv.hostPlatform.isLinux) {
-    env.PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
-
     scripts = {
       # Reports sonames the installed browsers need but chromium-libs does not provide.
       check-chromium-libs.text = ''
@@ -64,9 +62,17 @@ in {
       '';
     };
 
+    # Only NixOS lacks the system libraries the prebuilt chromium is linked against.
+    # Other distros (CI runners, ubuntu dev machines) have them, and mixing them with
+    # nixpkgs' libraries breaks chromium: their glibc is older than the one nixpkgs
+    # builds against (`GLIBC_ABI_GNU2_TLS not found`).
     shellHook = ''
-      export LD_LIBRARY_PATH="${chromium-libs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-      check-chromium-libs || true
+      if [ -e /etc/NIXOS ]; then
+        export LD_LIBRARY_PATH="${chromium-libs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+        # Playwright's host requirements are debian packages, which NixOS never has.
+        export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
+        check-chromium-libs || true
+      fi
     '';
   };
 }
