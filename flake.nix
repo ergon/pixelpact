@@ -17,6 +17,7 @@
       imports = [inputs.nix-shell-parts.flakeModules.default];
 
       perSystem = {
+        config,
         pkgs,
         lib,
         ...
@@ -44,12 +45,21 @@
           systemd
         ]);
       in {
-        formatter = pkgs.alejandra;
+        formatter = config.shells.default.treefmt.build.wrapper;
 
         shells.default = {config, ...}: let
           repositoryRoot = config.git.root.shellVariable;
         in {
           git.root.enable = true;
+
+          treefmt = {
+            enable = true;
+            pre-commit-hook = true;
+            programs.alejandra.enable = true;
+            programs.prettier.enable = true;
+            programs.prettier.package = pkgs.prettier;
+            settings.global.excludes = ["*-lock.json"];
+          };
 
           packages = [pkgs.nodejs];
 
@@ -79,14 +89,10 @@
 
           env.PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
 
-          shellHook =
-            ''
-              ln -fs "${repositoryRoot}/bin/pre-commit" "${repositoryRoot}/.git/hooks/pre-commit"
-            ''
-            + lib.optionalString isLinux ''
-              export LD_LIBRARY_PATH="${chromium-libs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-              check-chromium-libs || true
-            '';
+          shellHook = lib.optionalString isLinux ''
+            export LD_LIBRARY_PATH="${chromium-libs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+            check-chromium-libs || true
+          '';
         };
       };
     };
