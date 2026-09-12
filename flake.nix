@@ -37,8 +37,8 @@
         nss
         systemd
       ]);
-      start-server = pkgs.writeShellScriptBin "start-server" ''cd $REPOSITORY_ROOT/pixelpact; npm run start'';
-      start-server-docker = pkgs.writeShellScriptBin "start-server-docker" ''cd $REPOSITORY_ROOT/pixelpact; docker compose up --build'';
+      start-server = pkgs.writeShellScriptBin "start-server" ''cd $REPOSITORY_ROOT/server; npm run start'';
+      start-server-docker = pkgs.writeShellScriptBin "start-server-docker" ''cd $REPOSITORY_ROOT/server; docker compose up --build'';
     in {
       devShells.default = pkgs.mkShellNoCC {
         buildInputs = [nodejs start-server start-server-docker];
