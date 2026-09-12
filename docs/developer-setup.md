@@ -9,5 +9,6 @@ cd path/to/pixelpact
 direnv allow
 cd server
 npm ci
+npx playwright install chromium-headless-shell
 start-server
 ```
