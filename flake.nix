@@ -46,13 +46,17 @@
       in {
         formatter = pkgs.alejandra;
 
-        shells.default = {
+        shells.default = {config, ...}: let
+          repositoryRoot = config.git.root.shellVariable;
+        in {
+          git.root.enable = true;
+
           packages = [pkgs.nodejs];
 
           scripts =
             {
-              start-server.text = ''cd "$REPOSITORY_ROOT/server"; npm run start'';
-              start-server-docker.text = ''cd "$REPOSITORY_ROOT/server"; docker compose up --build'';
+              start-server.text = ''cd "${repositoryRoot}/server"; npm run start'';
+              start-server-docker.text = ''cd "${repositoryRoot}/server"; docker compose up --build'';
             }
             // lib.optionalAttrs isLinux {
               # Reports sonames the installed browsers need but chromium-libs does not provide.
@@ -77,8 +81,7 @@
 
           shellHook =
             ''
-              export REPOSITORY_ROOT=$(pwd)
-              ln -fs "$REPOSITORY_ROOT/bin/pre-commit" "$REPOSITORY_ROOT/.git/hooks/pre-commit"
+              ln -fs "${repositoryRoot}/bin/pre-commit" "${repositoryRoot}/.git/hooks/pre-commit"
             ''
             + lib.optionalString isLinux ''
               export LD_LIBRARY_PATH="${chromium-libs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
