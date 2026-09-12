@@ -15,10 +15,12 @@
       pkgs = import nixpkgs {
         inherit system;
       };
+      inherit (pkgs) lib;
       nodejs = pkgs.nodejs;
+      isLinux = pkgs.stdenv.hostPlatform.isLinux;
       # Playwright's prebuilt chromium is not patchelf'ed for nix; give it its shared libs.
       # `check-chromium-libs`  reports drift in this list.
-      chromium-libs = pkgs.lib.makeLibraryPath (with pkgs; [
+      chromium-libs = lib.makeLibraryPath (with pkgs; [
         alsa-lib
         at-spi2-core
         dbus
@@ -47,7 +49,7 @@
           echo "check-chromium-libs: no browsers in $browsers - run 'npx playwright install'" >&2
           exit 0
         fi
-        missing=$(ldd "''${binaries[@]}" 2>/dev/null | grep 'not found' | awk '{print $1}' | sort -u)
+        missing=$(ldd "''${binaries[@]}" 2>/dev/null | { grep 'not found' || true; } | awk '{print $1}' | sort -u)
         if [ -n "$missing" ]; then
           echo "check-chromium-libs: chromium-libs in flake.nix is missing:" >&2
           echo "$missing" >&2
@@ -58,14 +60,17 @@
       start-server-docker = pkgs.writeShellScriptBin "start-server-docker" ''cd $REPOSITORY_ROOT/server; docker compose up --build'';
     in {
       devShells.default = pkgs.mkShellNoCC {
-        buildInputs = [nodejs check-chromium-libs start-server start-server-docker];
-        shellHook = ''
-          export REPOSITORY_ROOT=$(pwd)
-          export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-          export LD_LIBRARY_PATH="${chromium-libs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-          ln -fs "$REPOSITORY_ROOT/bin/pre-commit" "$REPOSITORY_ROOT/.git/hooks/pre-commit"
-          check-chromium-libs || true
-        '';
+        buildInputs = [nodejs start-server start-server-docker] ++ lib.optional isLinux check-chromium-libs;
+        shellHook =
+          ''
+            export REPOSITORY_ROOT=$(pwd)
+            export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
+            ln -fs "$REPOSITORY_ROOT/bin/pre-commit" "$REPOSITORY_ROOT/.git/hooks/pre-commit"
+          ''
+          + lib.optionalString isLinux ''
+            export LD_LIBRARY_PATH="${chromium-libs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+            check-chromium-libs || true
+          '';
       };
 
       formatter = pkgs.alejandra;
