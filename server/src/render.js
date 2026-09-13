@@ -3,8 +3,7 @@ import path from "node:path";
 import os from "node:os";
 import { chromium } from "playwright";
 import pino from "pino";
-import mhtml2html from "mhtml2html";
-import { JSDOM } from "jsdom";
+import { convert } from "mhtml-to-html";
 
 const logger = pino({
   level: process.env.LOG_LEVEL || "info",
@@ -24,10 +23,7 @@ export async function render(
   let indexFile;
   if (usehMhtmlConverter) {
     indexFile = `${workspaceDirectory}/index.html`;
-    const convertedHtml = mhtml2html.convert(actualMhtml, {
-      parseDOM: (html) => new JSDOM(html),
-    });
-    const actualHtml = convertedHtml.serialize();
+    const { data: actualHtml } = await convert(actualMhtml);
     await fs.writeFile(indexFile, actualHtml);
   } else {
     indexFile = `${workspaceDirectory}/index.mhtml`;
