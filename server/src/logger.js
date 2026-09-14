@@ -8,6 +8,11 @@ export const logger = pino({
   timestamp: pino.stdTimeFunctions.isoTime,
 });
 
+export async function measure(fn) {
+  const startedAt = performance.now();
+  return [await fn(), Math.round(performance.now() - startedAt)];
+}
+
 function resolveLevel() {
   if (process.env.LOG_LEVEL) {
     return process.env.LOG_LEVEL;
