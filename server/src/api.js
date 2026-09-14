@@ -1,13 +1,18 @@
 import fastify from "fastify";
 import { compare } from "./compare.js";
 import { render } from "./render.js";
-import { logger, measure } from "./logger.js";
+import { logger, measure, withLogContext } from "./logger.js";
 
 export function buildFastify(renderFn, compareFn) {
   const server = fastify({
     bodyLimit: 512 * 1024 * 1024, // 512MB
     loggerInstance: logger,
   });
+
+  // Puts the reqId on every line logged while handling this request.
+  server.addHook("onRequest", (request, reply, done) =>
+    withLogContext({ reqId: request.id }, done),
+  );
 
   server.addSchema({
     $id: "#viewport",
@@ -53,7 +58,6 @@ export function buildFastify(renderFn, compareFn) {
       },
     },
     handler: async (request) => {
-      const log = request.log;
       const expected = Buffer.from(request.body.expected, "base64");
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
@@ -62,20 +66,13 @@ export function buildFastify(renderFn, compareFn) {
       const usehMhtmlConverter = request.body.usehMhtmlConverter ?? true;
 
       const [actual, renderDurationMs] = await measure(() =>
-        renderFn(
-          actualHtml,
-          viewport,
-          fullpage,
-          style,
-          usehMhtmlConverter,
-          log,
-        ),
+        renderFn(actualHtml, viewport, fullpage, style, usehMhtmlConverter),
       );
       const [result, compareDurationMs] = await measure(() =>
-        compareFn(expected, actual, {}, log),
+        compareFn(expected, actual),
       );
 
-      log.info(
+      logger.info(
         {
           viewport,
           fullpage,
@@ -106,7 +103,6 @@ export function buildFastify(renderFn, compareFn) {
       },
     },
     handler: async (request) => {
-      const log = request.log;
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
       const fullpage = request.body.fullpage ?? false;
@@ -114,17 +110,10 @@ export function buildFastify(renderFn, compareFn) {
       const usehMhtmlConverter = request.body.usehMhtmlConverter ?? true;
 
       const [actual, renderDurationMs] = await measure(() =>
-        renderFn(
-          actualHtml,
-          viewport,
-          fullpage,
-          style,
-          usehMhtmlConverter,
-          log,
-        ),
+        renderFn(actualHtml, viewport, fullpage, style, usehMhtmlConverter),
       );
 
-      log.info(
+      logger.info(
         {
           viewport,
           fullpage,
@@ -146,10 +135,10 @@ export function buildFastify(renderFn, compareFn) {
     const statusCode = error.statusCode || 500;
     if (statusCode >= 500) {
       // Our fault: keep the stack, it is the only lead we get.
-      request.log.error({ err: error, statusCode }, "Request failed");
+      logger.error({ err: error, statusCode }, "Request failed");
     } else {
       // Their fault: a stack trace of our own validation code helps nobody.
-      request.log.warn(
+      logger.warn(
         {
           statusCode,
           code: error.code,

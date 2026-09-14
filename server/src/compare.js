@@ -4,7 +4,7 @@ import { logger } from "./logger.js";
 
 const defaultOptions = { threshold: 0.01 };
 
-export async function compare(expected, actual, options = {}, log = logger) {
+export async function compare(expected, actual, options = {}) {
   const expectedPng = PNG.sync.read(expected);
   const actualPng = PNG.sync.read(actual);
   const diffDimensions = {
@@ -16,7 +16,7 @@ export async function compare(expected, actual, options = {}, log = logger) {
     expectedPng.width !== actualPng.width ||
     expectedPng.height !== actualPng.height
   ) {
-    log.warn(
+    logger.warn(
       {
         expected: { width: expectedPng.width, height: expectedPng.height },
         actual: { width: actualPng.width, height: actualPng.height },
