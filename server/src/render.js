@@ -2,12 +2,8 @@ import fs from "fs/promises";
 import path from "node:path";
 import os from "node:os";
 import { chromium } from "playwright";
-import pino from "pino";
 import { convert } from "mhtml-to-html";
-
-const logger = pino({
-  level: process.env.LOG_LEVEL || "info",
-});
+import { logger } from "./logger.js";
 
 export async function render(
   actualMhtml,
