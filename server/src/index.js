@@ -1,5 +1,7 @@
 import { startApiServer } from "./api.js";
 
+let instance;
+
 async function shutdown() {
   if (instance) {
     await instance.close();
@@ -13,4 +15,4 @@ process.on("SIGINT", shutdown);
 // React to SIGTERM as it is sent by docker stop
 process.on("SIGTERM", shutdown);
 
-const instance = await startApiServer();
+instance = await startApiServer();
