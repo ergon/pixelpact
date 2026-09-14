@@ -1,7 +1,7 @@
 import fastify from "fastify";
 import { compare } from "./compare.js";
 import { render } from "./render.js";
-import { logger } from "./logger.js";
+import { logger, measure } from "./logger.js";
 
 export function buildFastify(renderFn, compareFn) {
   const server = fastify({
@@ -61,15 +61,34 @@ export function buildFastify(renderFn, compareFn) {
       const style = request.body.style;
       const usehMhtmlConverter = request.body.usehMhtmlConverter ?? true;
 
-      const actual = await renderFn(
-        actualHtml,
-        viewport,
-        fullpage,
-        style,
-        usehMhtmlConverter,
-        log,
+      const [actual, renderDurationMs] = await measure(() =>
+        renderFn(
+          actualHtml,
+          viewport,
+          fullpage,
+          style,
+          usehMhtmlConverter,
+          log,
+        ),
       );
-      const result = await compareFn(expected, actual);
+      const [result, compareDurationMs] = await measure(() =>
+        compareFn(expected, actual),
+      );
+
+      log.info(
+        {
+          viewport,
+          fullpage,
+          mhtmlConverter: usehMhtmlConverter,
+          styled: style !== undefined,
+          expectedBytes: expected.length,
+          actualBytes: result.actual.length,
+          numDiffPixels: result.numDiffPixels,
+          renderDurationMs,
+          compareDurationMs,
+        },
+        "Check completed",
+      );
 
       return {
         actual: result.actual.toString("base64"),
@@ -94,13 +113,27 @@ export function buildFastify(renderFn, compareFn) {
       const style = request.body.style;
       const usehMhtmlConverter = request.body.usehMhtmlConverter ?? true;
 
-      const actual = await renderFn(
-        actualHtml,
-        viewport,
-        fullpage,
-        style,
-        usehMhtmlConverter,
-        log,
+      const [actual, renderDurationMs] = await measure(() =>
+        renderFn(
+          actualHtml,
+          viewport,
+          fullpage,
+          style,
+          usehMhtmlConverter,
+          log,
+        ),
+      );
+
+      log.info(
+        {
+          viewport,
+          fullpage,
+          mhtmlConverter: usehMhtmlConverter,
+          styled: style !== undefined,
+          actualBytes: actual.length,
+          renderDurationMs,
+        },
+        "Render completed",
       );
 
       return {
