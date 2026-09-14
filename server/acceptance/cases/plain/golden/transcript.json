@@ -1,0 +1,45 @@
+{
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/render",
+      "body": {
+        "actualHtml": "<mhtml 950 bytes sha256:803db38c8513>",
+        "viewport": {
+          "width": 800,
+          "height": 600
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "actual": "<png 9497 bytes sha256:c2ea71f88cb1 -> 01-render.actual.png>"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/check",
+      "body": {
+        "actualHtml": "<mhtml 950 bytes sha256:803db38c8513>",
+        "expected": "<png 9497 bytes sha256:c2ea71f88cb1>",
+        "viewport": {
+          "width": 800,
+          "height": 600
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "actual": "<png 9497 bytes sha256:c2ea71f88cb1 -> 02-check.actual.png>",
+          "expected": "<png 9497 bytes sha256:c2ea71f88cb1 -> 02-check.expected.png>",
+          "diff": "<png 10956 bytes sha256:2436e7f76848 -> 02-check.diff.png>",
+          "numDiffPixels": 0
+        }
+      }
+    }
+  ],
+  "container": {
+    "exitCode": 0
+  }
+}

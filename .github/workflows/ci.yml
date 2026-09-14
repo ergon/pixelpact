@@ -1,0 +1,159 @@
+name: CI
+
+on: [push]
+
+# Only the latest push per ref is interesting.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
+        with:
+          # Keep dev shell inputs alive in the store so they end up in the cache.
+          nix_conf: |
+            keep-env-derivations = true
+            keep-outputs = true
+
+      - name: Restore and save Nix store
+        uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock', 'flake.nix', 'nix/**.nix') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+          # Keep the cache small enough to stay fast to up- and download.
+          gc-max-store-size-linux: 1G
+          purge: true
+          purge-prefixes: nix-${{ runner.os }}-
+          purge-created: 0
+          purge-primary-key: never
+
+      - name: Build dev shell
+        run: nix develop --command true
+
+      - name: Restore npm cache and playwright browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: |
+            ~/.npm
+            ~/.cache/ms-playwright
+          key: deps-${{ runner.os }}-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: deps-${{ runner.os }}-
+
+      - name: Check formatting
+        run: nix develop --command treefmt --ci
+
+      - name: Install dependencies
+        run: nix develop --command bash -c 'cd server && npm ci --prefer-offline --no-audit --no-fund'
+
+      - name: Install chromium
+        run: nix develop --command bash -c 'cd server && npx playwright install chromium-headless-shell'
+
+      - name: Run Tests
+        run: nix develop --command bash -c 'cd server && npm test'
+
+  # Builds the image, proves it works end to end against the golden samples, and
+  # only then publishes it. Build, test and push share one job so the artifact
+  # that gets pushed is byte-for-byte the one the acceptance suite just drove.
+  docker-image:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+      # The image under test ships its own browsers; playwright is only a
+      # transitive install here.
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
+        with:
+          nix_conf: |
+            keep-env-derivations = true
+            keep-outputs = true
+
+      - name: Restore Nix store
+        uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock', 'flake.nix', 'nix/**.nix') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+          # The test job owns this cache; this job only reads it.
+          save: false
+
+      - name: Build dev shell
+        run: nix develop --command true
+
+      - name: Restore npm cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      # Runs before the build so the labels are baked into the image we test.
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        with:
+          context: server
+          push: false
+          load: true
+          tags: pixelpact:ci
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Install dependencies
+        run: nix develop --command bash -c 'cd server && npm ci --prefer-offline --no-audit --no-fund'
+
+      - name: Run acceptance tests
+        env:
+          PIXELPACT_IMAGE: pixelpact:ci
+        run: nix develop --command bash -c 'cd server && npm run test:acceptance'
+
+      - name: Upload acceptance failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: acceptance-failures
+          path: server/acceptance/out/
+          if-no-files-found: ignore
+
+      - name: Log in to the Container registry
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Pushes the exact image the acceptance suite just verified, rather than
+      # rebuilding it.
+      - name: Push Docker image
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          printf '%s\n' "$TAGS" | while IFS= read -r tag; do
+            [ -n "$tag" ] || continue
+            docker tag pixelpact:ci "$tag"
+            docker push "$tag"
+          done
