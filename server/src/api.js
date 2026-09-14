@@ -143,11 +143,27 @@ export function buildFastify(renderFn, compareFn) {
   });
 
   server.setErrorHandler((error, request, reply) => {
-    logger.error(error.message);
+    const statusCode = error.statusCode || 500;
+    if (statusCode >= 500) {
+      // Our fault: keep the stack, it is the only lead we get.
+      request.log.error({ err: error, statusCode }, "Request failed");
+    } else {
+      // Their fault: a stack trace of our own validation code helps nobody.
+      request.log.warn(
+        {
+          statusCode,
+          code: error.code,
+          reason: error.message,
+          validation: error.validation,
+        },
+        "Request rejected",
+      );
+    }
+
     const errorResponse = {
       message: error.message,
       error: error.error,
-      statusCode: error.statusCode || 500,
+      statusCode,
     };
     reply.code(errorResponse.statusCode).send(errorResponse);
   });
