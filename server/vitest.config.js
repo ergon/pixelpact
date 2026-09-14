@@ -7,6 +7,7 @@ export default defineConfig({
     include: ["src/**/*.test.js"],
     // Tests spawn chromium; forks keep each file in its own process.
     pool: "forks",
+    setupFiles: ["./vitest.setup.js"],
     coverage: {
       provider: "v8",
       include: ["src/**/*.js"],
