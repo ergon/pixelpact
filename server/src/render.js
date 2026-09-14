@@ -42,28 +42,24 @@ export async function render(
 
 export class BrowserRenderer {
   async start() {
-    logger.debug("Starting rendering  browser");
     this.browser = await chromium.launch();
-    logger.debug("Rendering browser started");
+    logger.debug("Browser launched");
   }
 
   async screenshot(url, viewport, fullPage, style) {
-    logger.debug("Creating screenshot", { url });
+    logger.debug({ url }, "Loading page");
     const page = await this.browser.newPage({ viewport });
-    logger.debug("Waiting for page to load", { url });
     await page.goto(url);
-    logger.debug(`Page loaded`, { url });
     const screenshot = await page.screenshot({ fullPage, style });
-    logger.debug(`Screenshot taken`);
+    logger.debug({ url }, "Screenshot taken");
     return screenshot;
   }
 
   async close() {
     if (this.browser !== undefined) {
-      logger.debug("Stopping rendering browser");
       await this.browser.close();
       this.browser = undefined;
-      logger.debug("rendering browser stopped");
+      logger.debug("Browser closed");
     }
   }
 }
