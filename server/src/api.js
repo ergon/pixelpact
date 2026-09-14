@@ -6,6 +6,7 @@ import { logger } from "./logger.js";
 export function buildFastify(renderFn, compareFn) {
   const server = fastify({
     bodyLimit: 512 * 1024 * 1024, // 512MB
+    loggerInstance: logger,
   });
 
   server.addSchema({
@@ -52,6 +53,7 @@ export function buildFastify(renderFn, compareFn) {
       },
     },
     handler: async (request) => {
+      const log = request.log;
       const expected = Buffer.from(request.body.expected, "base64");
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
@@ -65,6 +67,7 @@ export function buildFastify(renderFn, compareFn) {
         fullpage,
         style,
         usehMhtmlConverter,
+        log,
       );
       const result = await compareFn(expected, actual);
 
@@ -84,6 +87,7 @@ export function buildFastify(renderFn, compareFn) {
       },
     },
     handler: async (request) => {
+      const log = request.log;
       const actualHtml = request.body.actualHtml;
       const viewport = request.body.viewport;
       const fullpage = request.body.fullpage ?? false;
@@ -96,6 +100,7 @@ export function buildFastify(renderFn, compareFn) {
         fullpage,
         style,
         usehMhtmlConverter,
+        log,
       );
 
       return {

@@ -11,12 +11,13 @@ export async function render(
   fullpage,
   style,
   usehMhtmlConverter,
+  log = logger,
 ) {
-  const renderer = new BrowserRenderer();
+  const renderer = new BrowserRenderer(log);
   const workspaceDirectory = await fs.mkdtemp(
     path.join(os.tmpdir(), "pixelpact-"),
   );
-  logger.debug(
+  log.debug(
     { mhtmlBytes: actualMhtml.length, workspaceDirectory },
     "Rendering page source",
   );
@@ -26,14 +27,14 @@ export async function render(
     indexFile = `${workspaceDirectory}/index.html`;
     const { data: actualHtml } = await convert(actualMhtml);
     await fs.writeFile(indexFile, actualHtml);
-    logger.debug(
+    log.debug(
       { indexFile, htmlBytes: actualHtml.length },
       "Converted MHTML to HTML",
     );
   } else {
     indexFile = `${workspaceDirectory}/index.mhtml`;
     await fs.writeFile(indexFile, actualMhtml);
-    logger.debug({ indexFile }, "Wrote MHTML as is");
+    log.debug({ indexFile }, "Wrote MHTML as is");
   }
   try {
     await renderer.start();
@@ -51,17 +52,21 @@ export async function render(
 }
 
 export class BrowserRenderer {
+  constructor(log = logger) {
+    this.log = log;
+  }
+
   async start() {
     const [browser, durationMs] = await measure(() => chromium.launch());
     this.browser = browser;
-    logger.debug(
+    this.log.debug(
       { browserVersion: browser.version(), durationMs },
       "Browser launched",
     );
   }
 
   async screenshot(url, viewport, fullPage, style) {
-    logger.debug({ url }, "Loading page");
+    this.log.debug({ url }, "Loading page");
     const [page, loadDurationMs] = await measure(async () => {
       const page = await this.browser.newPage({ viewport });
       await page.goto(url);
@@ -71,7 +76,7 @@ export class BrowserRenderer {
     const [screenshot, screenshotDurationMs] = await measure(() =>
       page.screenshot({ fullPage, style }),
     );
-    logger.debug(
+    this.log.debug(
       { url, loadDurationMs, screenshotDurationMs, bytes: screenshot.length },
       "Screenshot taken",
     );
@@ -82,7 +87,7 @@ export class BrowserRenderer {
     if (this.browser !== undefined) {
       await this.browser.close();
       this.browser = undefined;
-      logger.debug("Browser closed");
+      this.log.debug("Browser closed");
     }
   }
 }
