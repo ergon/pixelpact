@@ -72,7 +72,7 @@ export function buildFastify(renderFn, compareFn) {
         ),
       );
       const [result, compareDurationMs] = await measure(() =>
-        compareFn(expected, actual),
+        compareFn(expected, actual, {}, log),
       );
 
       log.info(

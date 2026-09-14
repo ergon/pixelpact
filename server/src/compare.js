@@ -1,13 +1,31 @@
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
+import { logger } from "./logger.js";
 
-export async function compare(expected, actual, options = { threshold: 0.01 }) {
+const defaultOptions = { threshold: 0.01 };
+
+export async function compare(expected, actual, options = {}, log = logger) {
   const expectedPng = PNG.sync.read(expected);
   const actualPng = PNG.sync.read(actual);
   const diffDimensions = {
     width: Math.max(expectedPng.width, actualPng.width),
     height: Math.max(expectedPng.height, actualPng.height),
   };
+
+  if (
+    expectedPng.width !== actualPng.width ||
+    expectedPng.height !== actualPng.height
+  ) {
+    log.warn(
+      {
+        expected: { width: expectedPng.width, height: expectedPng.height },
+        actual: { width: actualPng.width, height: actualPng.height },
+        diff: diffDimensions,
+      },
+      "Expected and actual differ in size, padding both before comparing",
+    );
+  }
+
   const resizedExpectedPng = createResized(expectedPng, diffDimensions);
   const resizedActualPng = createResized(actualPng, diffDimensions);
   const diffPng = new PNG(diffDimensions);
@@ -17,7 +35,7 @@ export async function compare(expected, actual, options = { threshold: 0.01 }) {
     diffPng.data,
     diffDimensions.width,
     diffDimensions.height,
-    options,
+    { ...defaultOptions, ...options },
   );
   const diff = PNG.sync.write(diffPng);
 
