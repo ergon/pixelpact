@@ -16,12 +16,14 @@ const LOGS = "logs.jsonl";
 /** Collects every request a case makes so the whole exchange can be pinned at once.
  * Cases assert nothing themselves; this is what makes that possible. */
 export function createRecorder() {
-  const steps = [];
+  const requests = [];
   return {
     record(exchange) {
-      steps.push({ step: steps.length + 1, ...exchange });
+      // The number only ever surfaces in the payload filenames; the transcript
+      // gets its order from the array.
+      requests.push({ number: requests.length + 1, ...exchange });
     },
-    steps,
+    requests,
   };
 }
 
@@ -35,32 +37,35 @@ export function createRecorder() {
  */
 export async function pinGoldens({
   dir,
-  steps,
+  requests,
   container,
   logs,
   updateSnapshot,
 }) {
   const goldenDirectory = path.join(dir, "golden");
-  const transcript = { steps: [], container };
+  const transcript = { requests: [], container };
   const payloads = new Map();
 
   for (const {
-    step,
+    number,
     method,
     route,
     requestBody,
     status,
     responseBody,
-  } of steps) {
+  } of requests) {
     const operation = route.replace(/^\//, "");
-    const request = elide(requestBody, {});
-    // Only responses get their payloads written out - requests are either
-    // repository fixtures or a previous response, and the sha shows the linkage.
-    const response = elide(responseBody, { step, operation, payloads });
-    transcript.steps.push({
-      step,
-      request: { method, path: route, body: request },
-      response: { status, body: response },
+    transcript.requests.push({
+      method,
+      path: route,
+      // No `payloads`, so a request payload gets a descriptor but no file of its
+      // own: it is either a repository fixture or an earlier response, and the
+      // sha is what shows that linkage.
+      body: elide(requestBody, {}),
+      response: {
+        status,
+        body: elide(responseBody, { number, operation, payloads }),
+      },
     });
   }
 
@@ -89,7 +94,7 @@ export async function pinGoldens({
 
 /** Replaces payload strings with a descriptor, and records the bytes to pin
  * when {@link payloads} is supplied. */
-function elide(body, { step, operation, payloads }) {
+function elide(body, { number, operation, payloads }) {
   const elided = {};
   for (const [key, value] of Object.entries(body ?? {})) {
     if (typeof value !== "string" || value.length < BLOB_MIN_LENGTH) {
@@ -99,7 +104,7 @@ function elide(body, { step, operation, payloads }) {
     const { kind, bytes, extension } = classify(value);
     let name;
     if (payloads) {
-      name = `${String(step).padStart(2, "0")}-${operation}.${key}.${extension}`;
+      name = `${String(number).padStart(2, "0")}-${operation}.${key}.${extension}`;
       payloads.set(name, bytes);
     }
     const digest = crypto

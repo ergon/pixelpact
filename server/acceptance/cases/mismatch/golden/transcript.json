@@ -1,16 +1,13 @@
 {
-  "steps": [
+  "requests": [
     {
-      "step": 1,
-      "request": {
-        "method": "POST",
-        "path": "/render",
-        "body": {
-          "actualHtml": "<mhtml 2151 bytes sha256:5ef04f093a3d>",
-          "viewport": {
-            "width": 800,
-            "height": 600
-          }
+      "method": "POST",
+      "path": "/render",
+      "body": {
+        "actualHtml": "<mhtml 2151 bytes sha256:5ef04f093a3d>",
+        "viewport": {
+          "width": 800,
+          "height": 600
         }
       },
       "response": {
@@ -21,17 +18,14 @@
       }
     },
     {
-      "step": 2,
-      "request": {
-        "method": "POST",
-        "path": "/check",
-        "body": {
-          "actualHtml": "<mhtml 2154 bytes sha256:cf005f24eabd>",
-          "expected": "<png 13500 bytes sha256:db92d1ea66e2>",
-          "viewport": {
-            "width": 800,
-            "height": 600
-          }
+      "method": "POST",
+      "path": "/check",
+      "body": {
+        "actualHtml": "<mhtml 2154 bytes sha256:cf005f24eabd>",
+        "expected": "<png 13500 bytes sha256:db92d1ea66e2>",
+        "viewport": {
+          "width": 800,
+          "height": 600
         }
       },
       "response": {

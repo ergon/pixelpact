@@ -99,7 +99,7 @@ export function pixelpactCase(dir, env = { LOG_LEVEL: "debug" }) {
       const logs = normalizeLogs(await readContainerLogs(container));
       await pinGoldens({
         dir,
-        steps: recorder.steps,
+        requests: recorder.requests,
         container: { exitCode },
         logs,
         updateSnapshot: inject("updateSnapshot"),

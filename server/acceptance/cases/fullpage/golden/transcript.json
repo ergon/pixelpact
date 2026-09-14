@@ -1,16 +1,13 @@
 {
-  "steps": [
+  "requests": [
     {
-      "step": 1,
-      "request": {
-        "method": "POST",
-        "path": "/render",
-        "body": {
-          "actualHtml": "<mhtml 1269 bytes sha256:e7a5f035b2e4>",
-          "viewport": {
-            "width": 800,
-            "height": 600
-          }
+      "method": "POST",
+      "path": "/render",
+      "body": {
+        "actualHtml": "<mhtml 1269 bytes sha256:e7a5f035b2e4>",
+        "viewport": {
+          "width": 800,
+          "height": 600
         }
       },
       "response": {
@@ -21,18 +18,15 @@
       }
     },
     {
-      "step": 2,
-      "request": {
-        "method": "POST",
-        "path": "/render",
-        "body": {
-          "actualHtml": "<mhtml 1269 bytes sha256:e7a5f035b2e4>",
-          "viewport": {
-            "width": 800,
-            "height": 600
-          },
-          "fullpage": true
-        }
+      "method": "POST",
+      "path": "/render",
+      "body": {
+        "actualHtml": "<mhtml 1269 bytes sha256:e7a5f035b2e4>",
+        "viewport": {
+          "width": 800,
+          "height": 600
+        },
+        "fullpage": true
       },
       "response": {
         "status": 200,

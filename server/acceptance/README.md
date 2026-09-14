@@ -83,16 +83,37 @@ cases/form/golden/
   logs.jsonl                the container's whole log stream, normalized
 ```
 
-`transcript.json` also records the container's exit code, so a broken shutdown
-path shows up. Response payloads over 256 bytes become a descriptor plus their
-own file:
+`transcript.json` is a list of `requests`, each with its `response`, plus the
+container's exit code — so a broken shutdown path shows up too:
 
 ```json
-"actual": "<png 13500 bytes sha256:db92d1ea66e2 -> 01-render.actual.png>"
+{
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/render",
+      "body": { "actualHtml": "<mhtml 2151 bytes sha256:5ef04f093a3d>", "viewport": {...} },
+      "response": {
+        "status": 200,
+        "body": { "actual": "<png 13500 bytes sha256:db92d1ea66e2 -> 01-render.actual.png>" }
+      }
+    }
+  ],
+  "container": { "exitCode": 0 }
+}
 ```
 
-Request payloads get a descriptor but no file — they are either a fixture in
-this repository or a previous response, and the sha makes that linkage visible.
+Payloads over 256 bytes become that descriptor. A **response** payload also gets
+written out as its own byte-exact file. A **request** payload gets the descriptor
+only — it is either a fixture in this repository or an earlier response, and the
+sha is what makes that linkage visible (above, the next request's `expected` sha
+is the same `db92d1ea66e2`).
+
+The transcript overlaps the logs on purpose: the logs are the server's
+self-report, the transcript is what a client observed. When only the logs move,
+logging regressed — which is not something a log golden can tell you on its own.
+The transcript is also the only record of the **response body's shape**: a
+dropped or added response key changes nothing in the logs.
 
 ### Why byte-exact pixels work
 
