@@ -16,7 +16,8 @@ in {
     programs.alejandra.enable = true;
     programs.prettier.enable = true;
     programs.prettier.package = pkgs.prettier;
-    settings.global.excludes = ["*-lock.json"];
+    # Acceptance goldens are generated output; prettier must not rewrite them.
+    settings.global.excludes = ["*-lock.json" "server/acceptance/cases/*/golden/*"];
   };
 
   packages = [pkgs.nodejs];

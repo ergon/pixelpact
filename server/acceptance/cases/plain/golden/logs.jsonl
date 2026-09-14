@@ -1,0 +1,22 @@
+{"level":"info","name":"pixelpact","msg":"Server listening at <address>"}
+{"level":"info","name":"pixelpact","msg":"Server listening at <address>"}
+{"level":"info","name":"pixelpact","reqId":"req-1","req":{"method":"POST","url":"/render","host":"<host>","remoteAddress":"<address>","remotePort":"<port>"},"msg":"incoming request"}
+{"level":"debug","name":"pixelpact","reqId":"req-1","mhtmlBytes":950,"workspaceDirectory":"<workspace>","msg":"Rendering page source"}
+{"level":"debug","name":"pixelpact","reqId":"req-1","indexFile":"<workspace>/index.html","htmlBytes":921,"msg":"Converted MHTML to HTML"}
+{"level":"debug","name":"pixelpact","reqId":"req-1","browserVersion":"153.0.8010.12","durationMs":"<ms>","msg":"Browser launched"}
+{"level":"debug","name":"pixelpact","reqId":"req-1","url":"file://<workspace>/index.html","msg":"Loading page"}
+{"level":"debug","name":"pixelpact","reqId":"req-1","url":"file://<workspace>/index.html","loadDurationMs":"<ms>","screenshotDurationMs":"<ms>","bytes":9497,"msg":"Screenshot taken"}
+{"level":"debug","name":"pixelpact","reqId":"req-1","msg":"Browser closed"}
+{"level":"info","name":"pixelpact","reqId":"req-1","viewport":{"width":800,"height":600},"fullpage":false,"mhtmlConverter":true,"styled":false,"actualBytes":9497,"renderDurationMs":"<ms>","msg":"Render completed"}
+{"level":"info","name":"pixelpact","reqId":"req-1","res":{"statusCode":200},"responseTime":"<ms>","msg":"request completed"}
+{"level":"info","name":"pixelpact","reqId":"req-2","req":{"method":"POST","url":"/check","host":"<host>","remoteAddress":"<address>","remotePort":"<port>"},"msg":"incoming request"}
+{"level":"debug","name":"pixelpact","reqId":"req-2","mhtmlBytes":950,"workspaceDirectory":"<workspace>","msg":"Rendering page source"}
+{"level":"debug","name":"pixelpact","reqId":"req-2","indexFile":"<workspace>/index.html","htmlBytes":921,"msg":"Converted MHTML to HTML"}
+{"level":"debug","name":"pixelpact","reqId":"req-2","browserVersion":"153.0.8010.12","durationMs":"<ms>","msg":"Browser launched"}
+{"level":"debug","name":"pixelpact","reqId":"req-2","url":"file://<workspace>/index.html","msg":"Loading page"}
+{"level":"debug","name":"pixelpact","reqId":"req-2","url":"file://<workspace>/index.html","loadDurationMs":"<ms>","screenshotDurationMs":"<ms>","bytes":9497,"msg":"Screenshot taken"}
+{"level":"debug","name":"pixelpact","reqId":"req-2","msg":"Browser closed"}
+{"level":"info","name":"pixelpact","reqId":"req-2","viewport":{"width":800,"height":600},"fullpage":false,"mhtmlConverter":true,"styled":false,"expectedBytes":9497,"actualBytes":9497,"numDiffPixels":0,"renderDurationMs":"<ms>","compareDurationMs":"<ms>","msg":"Check completed"}
+{"level":"info","name":"pixelpact","reqId":"req-2","res":{"statusCode":200},"responseTime":"<ms>","msg":"request completed"}
+{"level":"info","name":"pixelpact","signal":"SIGTERM","msg":"Shutting down"}
+{"level":"info","name":"pixelpact","msg":"Shutdown complete"}

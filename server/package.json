@@ -9,7 +9,8 @@
   "scripts": {
     "start": "LOG_LEVEL=debug node --watch src/index.js | pino-pretty",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:acceptance": "vitest run --config vitest.acceptance.config.js"
   },
   "dependencies": {
     "fastify": "5.12.4",

@@ -1,0 +1,24 @@
+{
+  "steps": [
+    {
+      "step": 1,
+      "request": {
+        "method": "POST",
+        "path": "/check",
+        "body": {
+          "actualHtml": "<mhtml 950 bytes sha256:803db38c8513>"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "message": "body must have required property 'expected'",
+          "statusCode": 400
+        }
+      }
+    }
+  ],
+  "container": {
+    "exitCode": 0
+  }
+}

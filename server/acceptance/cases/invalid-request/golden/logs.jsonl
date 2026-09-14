@@ -1,0 +1,7 @@
+{"level":"info","name":"pixelpact","msg":"Server listening at <address>"}
+{"level":"info","name":"pixelpact","msg":"Server listening at <address>"}
+{"level":"info","name":"pixelpact","reqId":"req-1","req":{"method":"POST","url":"/check","host":"<host>","remoteAddress":"<address>","remotePort":"<port>"},"msg":"incoming request"}
+{"level":"warn","name":"pixelpact","reqId":"req-1","statusCode":400,"code":"FST_ERR_VALIDATION","reason":"body must have required property 'expected'","validation":[{"instancePath":"","schemaPath":"#/required","keyword":"required","params":{"missingProperty":"expected"},"message":"must have required property 'expected'"}],"msg":"Request rejected"}
+{"level":"info","name":"pixelpact","reqId":"req-1","res":{"statusCode":400},"responseTime":"<ms>","msg":"request completed"}
+{"level":"info","name":"pixelpact","signal":"SIGTERM","msg":"Shutting down"}
+{"level":"info","name":"pixelpact","msg":"Shutdown complete"}

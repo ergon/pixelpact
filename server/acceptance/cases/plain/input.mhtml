@@ -1,0 +1,26 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: http://localhost:8000/plain
+Subject: Plain
+Date: Thu, 29 Jun 2023 10:36:55 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--plainSingleParteNoSubResources0000000000----"
+
+
+------MultipartBoundary--plainSingleParteNoSubResources0000000000----
+Content-Type: text/html
+Content-ID: <frame-0000000000000000000000000000000A@mhtml.blink>
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://localhost:8000/plain
+
+<!DOCTYPE html><html lang=3D"en"><head><meta http-equiv=3D"Content-Type" co=
+ntent=3D"text/html; charset=3DUTF-8">
+    <title>Plain</title>
+    <style>body { font-family: serif; margin: 24px; }</style>
+  </head>
+  <body>
+    <h1>Plain document</h1>
+    <p>A single MIME part with no sub-resources.</p>
+  </body></html>
+------MultipartBoundary--plainSingleParteNoSubResources0000000000------
