@@ -1,0 +1,33 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: http://localhost:8000/tall
+Subject: Tall
+Date: Thu, 29 Jun 2023 10:36:55 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--fullpageTallerThanTheViewport000000----"
+
+
+------MultipartBoundary--fullpageTallerThanTheViewport000000----
+Content-Type: text/html
+Content-ID: <frame-0000000000000000000000000000000B@mhtml.blink>
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://localhost:8000/tall
+
+<!DOCTYPE html><html lang=3D"en"><head><meta http-equiv=3D"Content-Type" co=
+ntent=3D"text/html; charset=3DUTF-8">
+    <title>Tall</title>
+    <style>
+      body { font-family: serif; margin: 0; }
+      section { height: 400px; padding: 24px; }
+      section:nth-child(odd) { background: #eef; }
+      section:nth-child(even) { background: #ffe; }
+    </style>
+  </head>
+  <body>
+    <section><h1>Band one</h1><p>The viewport ends inside band two.</p></section>
+    <section><h1>Band two</h1></section>
+    <section><h1>Band three</h1></section>
+    <section><h1>Band four</h1><p>Only a fullpage capture reaches this.</p></section>
+  </body></html>
+------MultipartBoundary--fullpageTallerThanTheViewport000000------
