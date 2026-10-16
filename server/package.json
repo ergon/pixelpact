@@ -12,7 +12,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "fastify": "5.12.5",
+    "fastify": "5.12.7",
     "mhtml-to-html": "2.1.0",
     "pino": "10.4.0",
     "pixelmatch": "7.2.0",
